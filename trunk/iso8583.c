@@ -1,0 +1,230 @@
+#include <stdlib.h>
+#include <string.h>
+#include "iso8583.h"
+
+
+/* Initialize an ISO message struct - i.e. set all entries to NULL */
+void iso8583_init(isomsg *m)
+{
+	int i;
+
+	for (i = 0; i <= 128; i++) {
+		m->fld[i] = NULL;
+	}
+}
+
+
+/*
+ * Using the definition d, pack the content of the ISO message m into 
+ * buf. NOTE: buf must be large enough to contain the packed message.
+ * Returns the length of the data written to buf.
+ */
+int iso8583_pack(const isomsg *m, const isodef *d, char *buf)
+{
+	char *start = buf;
+	int flds;
+	int i;
+	char *bitmap;
+	int len;
+	char tmp[20];
+
+	/* Field 0 is mandatory and fixed length. */
+	if (strlen(m->fld[0]) != d[0].flds || d[0].lenflds != 0) {
+		/* FIXME: error */
+	}
+	memcpy(buf, m->fld[0], d[0].flds);
+	buf += d[0].flds;
+
+	/*
+	 * The bitmap contains either 64 or 128 fields - flds is the 
+	 * number of allowed fields, i.e. either 64 or 128.
+	 */
+	flds = 64;
+	for (i = 65; i <= 128; i++) {
+		if (m->fld[i] != NULL) {
+			flds = 128;
+			break;
+		}
+	}
+
+	bitmap = (char *) calloc(flds/8 + 1, sizeof(char));
+	/*
+	 * First bit in the bitmap (field 1) defines if the message is 
+	 * extended or not.
+	 * 0: not exteded - i.e. only (some of) the fields 0 to 64 are 
+	 *    used
+	 * 1: extended - i.e. (some of) the fields 0 to 128 are used
+	 * I.e. if one or more of the fields 65 to 128 is used, the 
+	 * bit is 1.
+	 */
+	if (flds == 128) {
+		bitmap[0] |= 0x80;
+	}
+
+	/*
+	 * The bits 2 to 64/128 defines if the corresponding field is 
+	 * present (1) or not (0).
+	 */
+	for (i = 2; i <= flds; i++) {
+		if (m->fld[i] != NULL) {
+			/* Set the i'th bit to 1 */
+			bitmap[(i-1)/8] |= 0x80 >> ((i-1)%8);
+		}
+	}
+	memcpy(buf, bitmap, flds/8);
+	buf += flds/8;
+
+	for (i = 2; i <= flds; i++) {
+		if ((bitmap[(i-1)/8] << ((i-1)%8)) & 0x80) { /* i'th bit != 0 */
+			if (d[i].lenflds) { /* Variable length */
+				switch (d[i].format) {
+				case ISO_NUMERIC: /* Fallthrough */
+				case ISO_ALPHANUMERIC:
+					len = strlen(m->fld[i]);
+					sprintf(tmp, "%%0%dd", d[i].lenflds);
+					sprintf(buf, tmp, len);
+					if (len > d[i].flds) {
+						/* FIXME: error */
+					}
+					buf += d[i].lenflds;
+					break;
+				case ISO_BINARY:
+					sprintf(tmp, "%%0%dd", d[i].lenflds);
+					sscanf(m->fld[i], tmp, &len);
+					if (len > d[i].flds) {
+						/* FIXME: error */
+					}
+					/* Copy length bytes from m->fld[i] */
+					len += d[i].lenflds;
+					break;
+				default:
+					/* FIXME: error */
+					break;
+				}
+			} else { /* Fixed length */
+				len = d[i].flds;
+
+				/* FIXME: How can we check ISO_BINARY? */
+				if (d[i].format != ISO_BINARY && 
+				    strlen(m->fld[i]) != len) {
+					/* FIXME: error */
+				}
+			}
+
+			memcpy(buf, m->fld[i], len);
+
+			buf += len;
+                }
+	}
+
+	return (buf - start);
+}
+
+
+/*
+ * Using the definition d, unpack the content of buf into the ISO 
+ * message struct m.
+ * Returns 0. FIXME: Should be something different.
+ */
+int iso8583_unpack(isomsg *m, const isodef *d, const char *buf)
+{
+	int flds;
+	int i;
+	int len;
+        char tmp[20];
+
+	/* Field 0 is mandatory and fixed length. */
+	if (d[0].lenflds != 0) {
+		/* FIXME: error */
+	}
+	m->fld[0] = (char *) malloc((d[0].flds + 1) * sizeof(char));
+	memcpy(m->fld[0], buf, d[0].flds);
+	m->fld[0][d[0].flds] = 0;
+	buf += d[0].flds;
+
+	/*
+	 * First bit in the bitmap (field 1) defines if the message is 
+	 * extended or not.
+	 * 0: not exteded - i.e. only (some of) the fields 0 to 64 are 
+	 *    used
+	 * 1: extended - i.e. (some of) the fields 0 to 128 are used
+	 * I.e. if one or more of the fields 65 to 128 is used, the 
+	 * bit is 1.
+	 */
+	if(buf[0] & 0x80) {
+		flds = 128;
+	} else {
+		flds = 64;
+	}
+	m->fld[1] = (char *) calloc(flds/8 + 1, sizeof(char));
+	memcpy(m->fld[1], buf, flds/8);
+	buf += flds/8;
+
+	for (i = 2; i <= flds; i++) {
+		if ((m->fld[1][(i-1)/8] << ((i-1)%8)) & 0x80) { /* i'th bit != 0 */
+			if (d[i].lenflds) { /* Variable length */
+				sprintf(tmp, "%%0%dd", d[i].lenflds);
+				sscanf(buf, tmp, &len);
+				/*
+				 * The length of a field can't be 
+				 * larger than defined by d[i].flds.
+				 */
+				if (len > d[i].flds) {
+					/* FIXME: warning/error */
+				}
+			} else { /* Fixed length */
+				len = d[i].flds;
+			}
+
+			switch (d[i].format) {
+			case ISO_NUMERIC: /* Fallthrough */
+			case ISO_ALPHANUMERIC:
+				/* Don't copy lenght bytes */
+				buf += d[i].lenflds;
+				break;
+			case ISO_BINARY:
+				/* Copy length bytes */
+				len += d[i].lenflds;
+				break;
+			default:
+				/* FIXME: error */
+				break;
+			}
+
+			m->fld[i] = (char *) malloc((len + 1) * sizeof(char));
+			memcpy(m->fld[i], buf, len);
+			m->fld[i][len] = 0;
+
+			buf += len;
+		}
+	}
+
+	return 0;
+}
+
+
+/* Dump the content of the ISO message m into a file */
+void iso8583_dump(FILE *fp, isomsg *m)
+{
+	int i;
+
+	for (i = 0; i <= 128; i++) {
+		if (m->fld[i] != NULL) {
+			fprintf(fp, "field #%d = %s\n", i, m->fld[i]);
+		}
+	}
+}
+
+
+/* Free memory used by the ISO message struct m. */
+void iso8583_free(isomsg *m)
+{
+	int i;
+
+	for (i = 0; i <= 128; i++) {
+		if (m->fld[i] != NULL) {
+			free(m->fld[i]);
+			m->fld[i] = NULL;
+		}
+	}
+}
