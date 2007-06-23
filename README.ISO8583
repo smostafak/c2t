@@ -1,0 +1,228 @@
+ISO8583 Parser
+==============
+
+isodef
+------
+
+The isodef struct is a definition of one field of a ISO message 
+contains four elements:
+
+int format      Describes the format of the field. This can be either 
+                ISO_BITMAP, ISO_NUMERIC, ISO_ALPHANUMERIC or 
+                ISO_BINARY. ISO_BITMAP may only be used for field 1.
+int lenflds     If the field is fixed length lenflds must be set to 
+                0. Otherwise lenflds describes how many bytes are used 
+                for the size of the field, typically 2 or 3.
+int flds        If the field is fixed lenght flds describes how many 
+                bytes are used by the field. Otherwise flds describes 
+                how many bytes the field maximum can contain.
+const char *dsc Is an optional description of the field which may be 
+                used for debugging purposes.
+
+A full definition of a ISO message is an array containing 129 
+isodef's (see 'ISO Definition example').
+
+
+isomsg
+------
+
+The isomsg struct contains one element:
+
+char *fld[129]  An array of char pointers. Each pointer points to a 
+                string with the content of the field. If the field 
+                isn't present the pointer must be NULL.
+
+
+Functions
+---------
+
+iso8583_init(isomsg *m):
+Initializes the isomsg struct, by setting all its pointers to NULL. 
+This function must be called before any other function is used.
+
+iso8583_pack(const isomsg *m, const isodef *d, char *buf):
+Packs the ISO message given by the isomsg struct m, using the 
+definition given by the isodef struct d, into the buffer buf. Note 
+that buf must be large enough to contain the packed data.
+The funtion returns the size of the data written to buf.
+
+iso8583_unpack(isomsg *m, const isodef *d, const char *buf):
+Unpacks the raw ISO message given by the buffer buf, using the 
+definition given by the isodef struct d, into the isomsg struct m.
+Note that if m already contains some data these might get overwritten, 
+so it's highly recommended to call iso8583_free between two calls of 
+iso8583_unpack.
+
+iso8583_dump(FILE *fp, isomsg *m):
+Writes the content of the isomsg struct m to a file pointed to by fp. 
+This might be used for debugging.
+
+iso8583_free(isomsg *m):
+Frees the memory used in the isomsg struct m and sets its pointers to 
+NULL. It's highly recommended to call this function when the struct 
+isn't used anylonger.
+
+
+Example of packing
+------------------
+
+isomsg m;
+char *buf;
+iso8583_init(&m);
+/* Get buf from somewhere */
+iso8583_unpack(&m, &iso93, buf);
+iso8583_free(&m);
+
+
+Example of unpacking
+--------------------
+
+isomsg m;
+char buf[4096];
+iso8583_init(&m);
+m.fld[0] = malloc(5 * sizeof(char));
+strncpy(m.fld[0], "1100", 5);
+m.fld[2] = malloc(9 * sizeof(char));
+strncpy(m.fld[2], "12345678", 9);
+m.fld[49] = malloc(4 * sizeof(char));
+strncpy(m.fld[49], "DKK", 4);
+iso8583_pack(&m, &iso93, buf);
+/* Do something with buf */
+iso8583_free(&m);
+
+ISO definition example
+----------------------
+
+This example shows a valid definition for the ISO8583-93 standard.
+
+isodef iso93[] = {
+    /*000*/ {ISO_NUMERIC, 0, 4, "Message Type Indicator"},
+    /*001*/ {ISO_BITMAP, 0, 16, "Bitmap"},
+    /*002*/ {ISO_NUMERIC, 2, 19, "Primary Account number"},
+    /*003*/ {ISO_NUMERIC, 0, 6, "Processing Code"},
+    /*004*/ {ISO_NUMERIC, 0, 12, "Amount, Transaction"},
+    /*005*/ {ISO_NUMERIC, 0, 12, "Amount, Reconciliation"},
+    /*006*/ {ISO_NUMERIC, 0, 12, "Amount, Cardholder billing"},
+    /*007*/ {ISO_NUMERIC, 0, 10, "Date and time, transmission"},
+    /*008*/ {ISO_NUMERIC, 0, 8, "Amount, Cardholder billing fee"},
+    /*009*/ {ISO_NUMERIC, 0, 8, "Conversion rate, Reconciliation"},
+    /*010*/ {ISO_NUMERIC, 0, 8, "Conversion rate, Cardholder billing"},
+    /*011*/ {ISO_NUMERIC, 0, 6, "Systems trace audit number"},
+    /*012*/ {ISO_NUMERIC, 0, 12, "Date and time, Local transaction"},
+    /*013*/ {ISO_NUMERIC, 0, 4, "Date, Effective"},
+    /*014*/ {ISO_NUMERIC, 0, 4, "Date, Expiration"},
+    /*015*/ {ISO_NUMERIC, 0, 6, "Date, Settlement"},
+    /*016*/ {ISO_NUMERIC, 0, 4, "Date, Conversion"},
+    /*017*/ {ISO_NUMERIC, 0, 4, "Date, Capture"},
+    /*018*/ {ISO_NUMERIC, 0, 4, "Merchant type"},
+    /*019*/ {ISO_NUMERIC, 0, 3, "Country code, Acquiring institution"},
+    /*020*/ {ISO_NUMERIC, 0, 3, "Country code, Primary account number"},
+    /*021*/ {ISO_NUMERIC, 0, 3, "Country code, Forwarding institution"},
+    /*022*/ {ISO_ALPHANUMERIC, 0, 12, "Point of service data code"},
+    /*023*/ {ISO_NUMERIC, 0, 3, "Card sequence number"},
+    /*024*/ {ISO_NUMERIC, 0, 3, "Function code"},
+    /*025*/ {ISO_NUMERIC, 0, 4, "Message reason code"},
+    /*026*/ {ISO_NUMERIC, 0, 4, "Card acceptor business code"},
+    /*027*/ {ISO_NUMERIC, 0, 1, "Approval code length"},
+    /*028*/ {ISO_NUMERIC, 0, 6, "Date, Reconciliation"},
+    /*029*/ {ISO_NUMERIC, 0, 3, "Reconciliation indicator"},
+    /*030*/ {ISO_NUMERIC, 0, 24, "Amounts, original"},
+    /*031*/ {ISO_ALPHANUMERIC, 2, 99, "Acquirer reference data"},
+    /*032*/ {ISO_NUMERIC, 2, 11, "Acquirer institution identification code"},
+    /*033*/ {ISO_NUMERIC, 2, 11, "Forwarding institution identification code"},
+    /*034*/ {ISO_ALPHANUMERIC, 2, 28, "Primary account number, extended"},
+    /*035*/ {ISO_ALPHANUMERIC, 2, 37, "Track 2 data"},
+    /*036*/ {ISO_ALPHANUMERIC, 3, 104, "Track 3 data"},
+    /*037*/ {ISO_ALPHANUMERIC, 0, 12, "Retrieval reference number"},
+    /*038*/ {ISO_ALPHANUMERIC, 0, 6, "Approval code"},
+    /*039*/ {ISO_NUMERIC, 0, 3, "Action code"},
+    /*040*/ {ISO_NUMERIC, 0, 3, "Service code"},
+    /*041*/ {ISO_ALPHANUMERIC, 0, 8, "Card acceptor terminal identification"},
+    /*042*/ {ISO_ALPHANUMERIC, 0, 15, "Card acceptor identification code"},
+    /*043*/ {ISO_ALPHANUMERIC, 2, 99, "Card acceptor name/location"},
+    /*044*/ {ISO_ALPHANUMERIC, 2, 99, "Additional response data"},
+    /*045*/ {ISO_ALPHANUMERIC, 2, 76, "Track 1 data"},
+    /*046*/ {ISO_ALPHANUMERIC, 3, 204, "Amounts, Fees"},
+    /*047*/ {ISO_ALPHANUMERIC, 3, 999, "Additional data - national"},
+    /*048*/ {ISO_ALPHANUMERIC, 3, 999, "Additional data - private"},
+    /*049*/ {ISO_ALPHANUMERIC, 0, 3, "Currency code, Transaction"},
+    /*050*/ {ISO_ALPHANUMERIC, 0, 3, "Currency code, Reconciliation"},
+    /*051*/ {ISO_ALPHANUMERIC, 0, 3, "Currency code, Cardholder billing"},
+    /*052*/ {ISO_BINARY, 0, 8, "Personal identification number, PIN) data"},
+    /*053*/ {ISO_BINARY, 2, 48, "Security related control information"},
+    /*054*/ {ISO_ALPHANUMERIC, 3, 120, "Amounts, additional"},
+    /*055*/ {ISO_BINARY, 3, 255, "IC card system related data"},
+    /*056*/ {ISO_NUMERIC, 2, 35, "Original data elements"},
+    /*057*/ {ISO_NUMERIC, 0, 3, "Authorization life cycle code"},
+    /*058*/ {ISO_NUMERIC, 2, 11, "Authorizing agent institution Id Code"},
+    /*059*/ {ISO_ALPHANUMERIC, 3, 999, "Transport data"},
+    /*060*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for national use"},
+    /*061*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for national use"},
+    /*062*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for private use"},
+    /*063*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for private use"},
+    /*064*/ {ISO_BINARY, 0, 8, "Message authentication code field"},
+    /*065*/ {ISO_BINARY, 0, 8, "Reserved for ISO use"},
+    /*066*/ {ISO_ALPHANUMERIC, 3, 204, "Amounts, original fees"},
+    /*067*/ {ISO_NUMERIC, 0, 2, "Extended payment data"},
+    /*068*/ {ISO_NUMERIC, 0, 3, "Country code, receiving institution"},
+    /*069*/ {ISO_NUMERIC, 0, 3, "Country code, settlement institution"},
+    /*070*/ {ISO_NUMERIC, 0, 3, "Country code, authorizing agent Inst."},
+    /*071*/ {ISO_NUMERIC, 0, 8, "Message number"},
+    /*072*/ {ISO_ALPHANUMERIC, 3, 999, "Data record"},
+    /*073*/ {ISO_NUMERIC, 0, 6, "Date, action"},
+    /*074*/ {ISO_NUMERIC, 0, 10, "Credits, number"},
+    /*075*/ {ISO_NUMERIC, 0, 10, "Credits, reversal number"},
+    /*076*/ {ISO_NUMERIC, 0, 10, "Debits, number"},
+    /*077*/ {ISO_NUMERIC, 0, 10, "Debits, reversal number"},
+    /*078*/ {ISO_NUMERIC, 0, 10, "Transfer, number"},
+    /*079*/ {ISO_NUMERIC, 0, 10, "Transfer, reversal number"},
+    /*080*/ {ISO_NUMERIC, 0, 10, "Inquiries, number"},
+    /*081*/ {ISO_NUMERIC, 0, 10, "Authorizations, number"},
+    /*082*/ {ISO_NUMERIC, 0, 10, "Inquiries, reversal number"},
+    /*083*/ {ISO_NUMERIC, 0, 10, "Payments, number"},
+    /*084*/ {ISO_NUMERIC, 0, 10, "Payments, reversal number"},
+    /*085*/ {ISO_NUMERIC, 0, 10, "Fee collections, number"},
+    /*086*/ {ISO_NUMERIC, 0, 16, "Credits, amount"},
+    /*087*/ {ISO_NUMERIC, 0, 16, "Credits, reversal amount"},
+    /*088*/ {ISO_NUMERIC, 0, 16, "Debits, amount"},
+    /*089*/ {ISO_NUMERIC, 0, 16, "Debits, reversal amount"},
+    /*090*/ {ISO_NUMERIC, 0, 10, "Authorizations, reversal number"},
+    /*091*/ {ISO_NUMERIC, 0, 3, "Country code, transaction Dest. Inst."},
+    /*092*/ {ISO_NUMERIC, 0, 3, "Country code, transaction Orig. Inst."},
+    /*093*/ {ISO_NUMERIC, 2, 11, "Transaction Dest. Inst. Id code"},
+    /*094*/ {ISO_NUMERIC, 2, 11, "Transaction Orig. Inst. Id code"},
+    /*095*/ {ISO_ALPHANUMERIC, 2, 99, "Card issuer reference data"},
+    /*096*/ {ISO_BINARY, 3, 999, "Key management data"},
+    /*097*/ {ISO_NUMERIC, 0, 1+16, "Amount, Net reconciliation"},
+    /*098*/ {ISO_ALPHANUMERIC, 0, 25, "Payee"},
+    /*099*/ {ISO_ALPHANUMERIC, 2, 11, "Settlement institution Id code"},
+    /*100*/ {ISO_NUMERIC, 2, 11, "Receiving institution Id code"},
+    /*101*/ {ISO_ALPHANUMERIC, 2, 17, "File name"},
+    /*102*/ {ISO_ALPHANUMERIC, 2, 28, "Account identification 1"},
+    /*103*/ {ISO_ALPHANUMERIC, 2, 28, "Account identification 2"},
+    /*104*/ {ISO_ALPHANUMERIC, 3, 100, "Transaction description"},
+    /*105*/ {ISO_NUMERIC, 0, 16, "Credits, Chargeback amount"},
+    /*106*/ {ISO_NUMERIC, 0, 16, "Debits, Chargeback amount"},
+    /*107*/ {ISO_NUMERIC, 0, 10, "Credits, Chargeback number"},
+    /*108*/ {ISO_NUMERIC, 0, 10, "Debits, Chargeback number"},
+    /*109*/ {ISO_ALPHANUMERIC, 2, 84, "Credits, Fee amounts"},
+    /*110*/ {ISO_ALPHANUMERIC, 2, 84, "Debits, Fee amounts"},
+    /*111*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for ISO use"},
+    /*112*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for ISO use"},
+    /*113*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for ISO use"},
+    /*114*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for ISO use"},
+    /*115*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for ISO use"},
+    /*116*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for national use"},
+    /*117*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for national use"},
+    /*118*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for national use"},
+    /*119*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for national use"},
+    /*120*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for national use"},
+    /*121*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for national use"},
+    /*122*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for national use"},
+    /*123*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for private use"},
+    /*124*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for private use"},
+    /*125*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for private use"},
+    /*126*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for private use"},
+    /*127*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for private use"},
+    /*128*/ {ISO_BINARY, 0, 8, "Message authentication code field"}
+};
