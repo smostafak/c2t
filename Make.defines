@@ -1,0 +1,19 @@
+# Common make definitions for SVR4 make.
+
+# Definitions required in all program directories to compile and link
+# C programs.
+
+# Common definitions
+CC=cc
+CFLAGS	= -g
+LIB_NAME = libiso8583.a 
+LDFLAGS = ${LIB_NAME} -lresolv -lsocket -lnsl -lpthread
+LIBS = ${LDFLAGS}
+RANLIB = ranlib
+AR = ar rv
+
+# Our library that almost every program needs.
+LIB_OBJS = iso8583.o
+
+# Common temp files to delete from each directory.
+CLEANFILES = core core.* *.core *.o temp.* *.out typescript* 
