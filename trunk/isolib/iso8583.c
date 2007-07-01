@@ -1,10 +1,15 @@
+/*!	\file	iso8583.c
+ * 		\brief	The main source file of this library 
+ */
 #include <stdlib.h> 
 #include <string.h>
 #include "iso8583.h"
 
-
-/* Initialize an ISO message struct - i.e. set all entries to NULL */
-void iso8583_init(isomsg *m)
+/*!	\fn	void iso8583_init(isomsg *m);			 
+ * 		\brief	Initialize an ISO message struct - i.e. set all entries to NULL
+ * 		\param	m is an ::isomsg   
+ */
+void iso8583_init(isomsg *m)	
 {
 	int i;
 
@@ -14,10 +19,15 @@ void iso8583_init(isomsg *m)
 }
 
 
-/*
- * Using the definition d, pack the content of the ISO message m into 
- * buf. NOTE: buf must be large enough to contain the packed message.
- * Returns the length of the data written to buf.
+/*!	\fn 	int iso8583_pack(const isomsg *m, const isodef *d, char *buf)
+ *		\brief  Using the definition d, pack the content of the ISO message m into buf. \n
+ * 				 NOTE: buf must be large enough to contain the packed message.
+ *				   Returns the length of the data written to buf.
+ * 
+ * 		\param		m is an ::isomsg structure pointer that contains all message elements to be packed
+ * 		\param 	d is an array of ::isodef structures which refers to all data element definitions of  an iso standard
+ * 		\param		buf is the iso message buffer that contains the packed iso message. 
+ * 		\return		The length of the iso message buffer.
  */
 int iso8583_pack(const isomsg *m, const isodef *d, char *buf)
 {
@@ -121,10 +131,13 @@ int iso8583_pack(const isomsg *m, const isodef *d, char *buf)
 }
 
 
-/*
- * Using the definition d, unpack the content of buf into the ISO 
- * message struct m.
- * Returns 0. FIXME: Should be something different.
+/*!	\fn			int iso8583_unpack(isomsg *m, const isodef *d, const char *buf)
+ * 		\brief 		Using the definition d, unpack the content of buf into the ISO message struct m.
+ * 		\param 	m is an ::isomsg structure pointer that contains all message elements which are unpacked
+ * 		\param 	d is an array of ::isodef structures which refers to all data element definitions of  an iso standard
+ * 		\param		buf is the iso message buffer that contains the iso message that needs unpacking.
+ * 		\returns    0 in case successful unpacking \n
+ * 						error number in case an error occured
  */
 int iso8583_unpack(isomsg *m, const isodef *d, const char *buf)
 {
@@ -203,7 +216,12 @@ int iso8583_unpack(isomsg *m, const isodef *d, const char *buf)
 }
 
 
-/* Dump the content of the ISO message m into a file */
+/*!	\fn 			void iso8583_dump(FILE *fp, isomsg *m)
+ * 		\brief 		Dump the content of the ISO message m into a file
+ * 		\param 	fp is a FILE pointer that points to the message-storing file
+ * 		\param		m is an ::isomsg structure pointer that contains all message elements which needs dumping 
+ */	
+ 	
 void iso8583_dump(FILE *fp, isomsg *m)
 {
 	int i;
@@ -216,7 +234,9 @@ void iso8583_dump(FILE *fp, isomsg *m)
 }
 
 
-/* Free memory used by the ISO message struct m. */
+/*!	\fn			void iso8583_free(isomsg *m)
+ *  	\brief		Free memory used by the ISO message struct m. 
+ */
 void iso8583_free(isomsg *m)
 {
 	int i;
