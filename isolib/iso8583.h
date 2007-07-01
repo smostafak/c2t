@@ -1,3 +1,6 @@
+/*!	\file		iso8583.h
+ * 		\brief	The header file contain all structure of this library
+ */
 #ifndef _ISO8583_H
 #define _ISO8583_H 1
 
@@ -8,18 +11,37 @@
 #define ISO_ALPHANUMERIC 2
 #define ISO_BINARY       3
 
+/*!	\struct		isodef
+ * 		\brief		The structure holds all data delement definitions of an iso8583 version.  		
+ */
 typedef struct {
+	/*!  \brief  The data element format:
+	 * 			- 0 for BITMAP
+	 * 			- 1 for Numeric
+	 * 			- 2 for alphanumeric
+	 * 			- 3 for binary
+	 */ 
 	int format;
-	int lenflds;
-	int flds;
-	const char *dsc;
+	
+	/*! \brief  This var represents the length of the len portion of this data element (LL or LLL) */	
+	int lenflds; 				
+	
+	/*! \brief This var represents the len of the data element */
+	int flds;					
+	
+	/*! \brief This var represents the description of this data element */
+	const char *dsc;	
 } isodef;
 
+/*!	\struct		isomsg
+ * 		\brief		The ISO message structure 		
+ */		
 typedef struct {
-	char *fld[129];
+	/*! \brief The 129 field pointer array		*/
+	char *fld[129];	
 } isomsg;
 
-void iso8583_init(isomsg *m);
+void iso8583_init(isomsg *m);	
 int iso8583_pack(const isomsg *m, const isodef *d, char *buf);
 int iso8583_unpack(isomsg *m, const isodef *d, const char *buf);
 void iso8583_dump(FILE *fp, isomsg *m);
