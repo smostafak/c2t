@@ -41,6 +41,7 @@ int iso8583_pack(const isomsg *m, const isodef *d, char *buf)
 	/* Field 0 is mandatory and fixed length. */
 	if (strlen(m->fld[0]) != d[0].flds || d[0].lenflds != 0) {
 		/* FIXME: error */
+		/*This error is the length of field is too long*/
 	}
 	memcpy(buf, m->fld[0], d[0].flds);
 	buf += d[0].flds;
@@ -109,6 +110,8 @@ int iso8583_pack(const isomsg *m, const isodef *d, char *buf)
 					break;
 				default:
 					/* FIXME: error */
+					/*The format error of this field*/
+					/*Format out of range*/
 					break;
 				}
 			} else { /* Fixed length */
@@ -247,4 +250,12 @@ void iso8583_free(isomsg *m)
 			m->fld[i] = NULL;
 		}
 	}
+}
+/*!	\fn			isoerrreport(int *fldErr, FILE *fp)
+ *  	\brief		Show the message error to the logfile. 
+ */
+void isoerrreport(int *fldErr, FILE *fp)
+{
+	
+}
 }
