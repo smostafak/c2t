@@ -59,7 +59,7 @@ typedef struct {
 void iso8583_init(isomsg *m);	
 int iso8583_pack(const isomsg *m, const isodef *d, char *buf);
 int iso8583_unpack(isomsg *m, const isodef *d, const char *buf);
-void isoreport(int *fldErr, FILE *fp)
+void isoerrreport(int *fldErr, FILE *fp)
 void iso8583_dump(FILE *fp, isomsg *m);
 void iso8583_free(isomsg *m);
 
