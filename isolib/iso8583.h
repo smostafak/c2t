@@ -41,9 +41,25 @@ typedef struct {
 	char *fld[129];	
 } isomsg;
 
+/*!	\struct		errmsg
+ * 		\brief		The ERROR ISO message structure 		
+ */	
+typedef struct {
+	/*!  \brief  The error format:
+	 * 			- 0 for 
+	 * 			- 1 for 
+	 * 			- 2 for 
+	 * 			- 3 for 
+	 */ 
+	int Err_ID;
+	
+	/*! \brief This var represents the description of this error */
+	const char *dsc;	
+} errmsg;
 void iso8583_init(isomsg *m);	
 int iso8583_pack(const isomsg *m, const isodef *d, char *buf);
 int iso8583_unpack(isomsg *m, const isodef *d, const char *buf);
+void isoreport(int *fldErr, FILE *fp)
 void iso8583_dump(FILE *fp, isomsg *m);
 void iso8583_free(isomsg *m);
 
