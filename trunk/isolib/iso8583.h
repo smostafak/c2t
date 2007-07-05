@@ -63,4 +63,9 @@ void isoerrreport(int *fldErr, FILE *fp)
 void iso8583_dump(FILE *fp, isomsg *m);
 void iso8583_free(isomsg *m);
 
+/*!	\func	set data to a field of iso msg	*/
+int set_field(isomsg* msg, const isodef *def, int idx, void* fld)
+/*!	\func	get data from a field of iso msg	*/
+int get_field(const char* buf, const isodef *def, int idx, void* fld)
+
 #endif /* iso8583.h */
