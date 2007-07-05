@@ -256,6 +256,5 @@ void iso8583_free(isomsg *m)
  */
 void isoerrreport(int *fldErr, FILE *fp)
 {
-	
-}
+
 }
