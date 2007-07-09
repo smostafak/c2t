@@ -5,6 +5,7 @@
 #define _ISO8583_H 1
 
 #include <stdio.h>
+#include <time.h>
 
 #define ISO_BITMAP       0
 #define ISO_NUMERIC      1

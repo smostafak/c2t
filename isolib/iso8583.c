@@ -256,5 +256,16 @@ void iso8583_free(isomsg *m)
  */
 void isoerrreport(int *fldErr, FILE *fp)
 {
-
+    time_t t;
+    int i;
+    t = time(0);
+    fprintf("The debug error for day: %s", ctime(&t));
+    for(i=0; i<129; i++)
+    {
+    	if fldErr(i) != 0 then
+    	{
+    		/*Searching for the desc of this error*/
+    	}
+    }
+    
 }
