@@ -57,8 +57,13 @@ int iso8583_pack(const isomsg *m, const isodef *d, char *buf)
 	char *bitmap;
 	int len;
 	char tmp[20];
+	int flderr[129]
 
 	/* Field 0 is mandatory and fixed length. */
+	           for (i = 0; i < 129; i++)
+	           {
+	        	   flderr[i] = 0
+	           }
 	if (strlen(m->fld[0]) != d[0].flds || d[0].lenflds != 0) {
 		/* FIXME: error */
 		/*This error is the length of field is too long*/
@@ -124,6 +129,8 @@ int iso8583_pack(const isomsg *m, const isodef *d, char *buf)
 					sscanf(m->fld[i], tmp, &len);
 					if (len > d[i].flds) {
 						/* FIXME: error */
+						/*The length of field is not correct*/
+						flderr[i] = 1;
 					}
 					/* Copy length bytes from m->fld[i] */
 					len += d[i].lenflds;
@@ -132,6 +139,7 @@ int iso8583_pack(const isomsg *m, const isodef *d, char *buf)
 					/* FIXME: error */
 					/*The format error of this field*/
 					/*Format out of range*/
+					flderr[i] = 3;
 					break;
 				}
 			} else { /* Fixed length */
@@ -141,6 +149,8 @@ int iso8583_pack(const isomsg *m, const isodef *d, char *buf)
 				if (d[i].format != ISO_BINARY && 
 				    strlen(m->fld[i]) != len) {
 					/* FIXME: error */
+					/*The lengthe is not correct*/
+					flderr[i] = 2;
 				}
 			}
 
@@ -149,7 +159,8 @@ int iso8583_pack(const isomsg *m, const isodef *d, char *buf)
 			buf += len;
                 }
 	}
-
+	/*write all error in this message to file*/
+	/*Call function isoerrrreport*/
 	return (buf - start);
 }
 
@@ -207,6 +218,7 @@ int iso8583_unpack(isomsg *m, const isodef *d, const char *buf)
 				 */
 				if (len > d[i].flds) {
 					/* FIXME: warning/error */
+					
 				}
 			} else { /* Fixed length */
 				len = d[i].flds;

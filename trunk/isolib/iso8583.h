@@ -61,7 +61,8 @@ typedef struct {
 } errmsg;
 const errmsg errdef[] ={
 		{1, ""},
-		{2, ""}};
+		{2, ""},
+		{3, ""}};
 void iso8583_init(isomsg *m);	
 int iso8583_set_fmtbitmap(isomsg *m, int bmp_flag);
 int iso8583_get_bitmap(isomsg *m, char *buf)
