@@ -36,7 +36,7 @@ int iso8583_set_fmtbitmap(isomsg *m, int bmp_flag){
  * 		\param		bimap is the output bitmap 
  * 		\return		error code
  */
-int iso8583_get_bitmap(isomsg *m, char *buf, char* bitmap){
+int iso8583_get_bitmap(isomsg *m, char *buf){
 }
 
 /*!	\fn 	int iso8583_pack(const isomsg *m, const isodef *d, char *buf)
