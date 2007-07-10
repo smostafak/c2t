@@ -61,7 +61,7 @@ typedef struct {
 } errmsg;
 void iso8583_init(isomsg *m);	
 int iso8583_set_fmtbitmap(isomsg *m, int bmp_flag);
-int iso8583_get_bitmap(isomsg *m, char *buf, int bitmap)
+int iso8583_get_bitmap(isomsg *m, char *buf, char* bitmap)
 int iso8583_pack(const isomsg *m, const isodef *d, char *buf);
 int iso8583_unpack(isomsg *m, const isodef *d, const char *buf);
 void isoerrreport(int *fldErr, FILE *fp);
