@@ -18,6 +18,26 @@ void iso8583_init(isomsg *m)
 	}
 }
 
+/*!	\fn 	int iso8583_fmtbitmap(isomsg *m, int bmp_flag)
+ *		\brief  set the bitmap flag for the isomsg struct m
+ *  
+ * 		\param		m is an ::isomsg structure pointer that contains all message elements to be packed or unpacked
+ * 		\param		bmp_flag is the flag used to identify whether the bitmap is in hexa format (bmp_flag=1) or binary format (bmp_flag=0) 
+ * 		\return		error code
+ */ 
+int iso8583_set_fmtbitmap(isomsg *m, int bmp_flag){
+}
+
+/*!	\fn 	int iso8583_get_bitmap(isomsg *m, char *buf, char* bitmap)
+ *		\brief  This function used to get the bitmap out of the message buffer
+ * 
+ * 		\param		m is an ::isomsg structure pointer that contains all message elements to be packed or unpacked
+ * 		\param		buf is the iso message buffer that contains the packed iso message.
+ * 		\param		bimap is the output bitmap 
+ * 		\return		error code
+ */
+int iso8583_get_bitmap(isomsg *m, char *buf, char* bitmap){
+}
 
 /*!	\fn 	int iso8583_pack(const isomsg *m, const isodef *d, char *buf)
  *		\brief  Using the definition d, pack the content of the ISO message m into buf. \n
@@ -269,3 +289,4 @@ void isoerrreport(int *fldErr, FILE *fp)
     }
     
 }
+

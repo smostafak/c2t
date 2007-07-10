@@ -38,6 +38,8 @@ typedef struct {
  * 		\brief		The ISO message structure 		
  */		
 typedef struct {
+	/*! \brief The flag to identify whether the bitmap is in binary or hexa format */
+	int bmp_flag;
 	/*! \brief The 129 field pointer array		*/
 	char *fld[129];	
 } isomsg;
@@ -58,15 +60,17 @@ typedef struct {
 	const char *dsc;	
 } errmsg;
 void iso8583_init(isomsg *m);	
+int iso8583_set_fmtbitmap(isomsg *m, int bmp_flag);
+int iso8583_get_bitmap(isomsg *m, char *buf, int bitmap)
 int iso8583_pack(const isomsg *m, const isodef *d, char *buf);
 int iso8583_unpack(isomsg *m, const isodef *d, const char *buf);
-void isoerrreport(int *fldErr, FILE *fp)
+void isoerrreport(int *fldErr, FILE *fp);
 void iso8583_dump(FILE *fp, isomsg *m);
 void iso8583_free(isomsg *m);
 
 /*!	\func	set data to a field of iso msg	*/
-int set_field(isomsg* msg, const isodef *def, int idx, void* fld)
+int set_field(isomsg* msg, const isodef *def, int idx, void* fld);
 /*!	\func	get data from a field of iso msg	*/
-int get_field(const char* buf, const isodef *def, int idx, void* fld)
+int get_field(const char* buf, const isodef *def, int idx, void* fld);
 
 #endif /* iso8583.h */
