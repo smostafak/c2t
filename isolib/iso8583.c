@@ -277,16 +277,27 @@ void iso8583_free(isomsg *m)
 void isoerrreport(int *fldErr, FILE *fp)
 {
     time_t t;
-    int i;
+    int i, j;
     t = time(0);
-    fprintf("The debug error for day: %s", ctime(&t));
+    fprintf(fp, "The debug error for day: %s", ctime(&t));
     for(i=0; i<129; i++)
     {
     	if fldErr(i) != 0 then
     	{
     		/*Searching for the desc of this error*/
+    		j = 0;
+    		while (errdef(j) != null)
+    		{
+    			if fleErr[i] = errdef(j)
+    			{
+    				fprintf(fp, "Error appear on the field %d is: %s", i, errdef[j].desc);
+    				break;
+    			}
+    			j = j + 1;
+    		}
+    	    
     	}
     }
-    
+    fclose(fp)
 }
 
