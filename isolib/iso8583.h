@@ -1,4 +1,4 @@
-/*!	\file		iso8583.h
+w/*!	\file		iso8583.h
  * 		\brief	The header file contain all structure of this library
  */
 #ifndef _ISO8583_H
@@ -59,10 +59,11 @@ typedef struct {
 	/*! \brief This var represents the description of this error */
 	const char *dsc;	
 } errmsg;
+/*Define the const error of iso message*/
 const errmsg errdef[] ={
-		{1, ""},
-		{2, ""},
-		{3, ""}};
+		{1, ""}, /*The length of field is to long*/
+		{2, ""}, /*The length of field is not correct*/
+		{3, ""}}; /*The format error*/
 void iso8583_init(isomsg *m);	
 int iso8583_set_fmtbitmap(isomsg *m, int bmp_flag);
 int iso8583_get_bitmap(isomsg *m, char *buf)
