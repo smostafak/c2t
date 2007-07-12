@@ -208,7 +208,8 @@ isodef pbsmg20[] = {
 	char *buf;
 	FILE *fp;
 
-	iso8583_init(&m);
+	iso8583_init(&m);	
+	m.bmp_flag = BMP_BINARY;
 
 	buf = (char *) calloc(4096, sizeof(char));
 	printf("\n--- Authorisation Request ---\n");

@@ -1,4 +1,4 @@
-w/*!	\file		iso8583.h
+/*!	\file		iso8583.h
  * 		\brief	The header file contain all structure of this library
  */
 #ifndef _ISO8583_H
@@ -11,6 +11,9 @@ w/*!	\file		iso8583.h
 #define ISO_NUMERIC      1
 #define ISO_ALPHANUMERIC 2
 #define ISO_BINARY       3
+
+#define BMP_BINARY		0
+#define BMP_HEXA			1
 
 /*!	\struct		isodef
  * 		\brief		The structure holds all data delement definitions of an iso8583 version.  		
@@ -66,16 +69,11 @@ const errmsg errdef[] ={
 		{3, ""}}; /*The format error*/
 void iso8583_init(isomsg *m);	
 int iso8583_set_fmtbitmap(isomsg *m, int bmp_flag);
-int iso8583_get_bitmap(isomsg *m, char *buf)
+int iso8583_get_bitmap(isomsg *m, isodef* def, char *buf);
 int iso8583_pack(const isomsg *m, const isodef *d, char *buf);
 int iso8583_unpack(isomsg *m, const isodef *d, const char *buf);
 void isoerrreport(int *fldErr, FILE *fp);
 void iso8583_dump(FILE *fp, isomsg *m);
 void iso8583_free(isomsg *m);
-
-/*!	\func	set data to a field of iso msg	*/
-int set_field(isomsg* msg, const isodef *def, int idx, void* fld);
-/*!	\func	get data from a field of iso msg	*/
-int get_field(const char* buf, const isodef *def, int idx, void* fld);
 
 #endif /* iso8583.h */
