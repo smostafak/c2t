@@ -1,19 +1,16 @@
 include ./Make.defines
 
-OBJS = iso8583-test.o
-PROGS = iso8583-test
+PROGS = iso8583-test utilities_test
 
 all:	lib	${PROGS}
 
 lib:	${LIB_OBJS} 
 		$(AR) ${LIB_NAME} $?
+		@rm ${LIB_OBJS}
 		${RANLIB} ${LIB_NAME}
 
-${PROGS}:	${OBJS}
-		${CC} ${CFLAGS} -o $@ ${OBJS} ${LIBS}
-
-${OBJ}: 
-		${CC} ${CFLAGS} $?
+${PROGS}: 	
+		${CC} ${CFLAGS} -o $@ $< ${LIBS}
 
 clean:
 		rm -f ${PROGS} ${CLEANFILES}

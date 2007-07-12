@@ -4,6 +4,7 @@
 #include <stdlib.h> 
 #include <string.h>
 #include "iso8583.h"
+#include "utilities.h"
 
 /*!	\fn	void iso8583_init(isomsg *m);			 
  * 		\brief	Initialize an ISO message struct - i.e. set all entries to NULL
@@ -12,32 +13,12 @@
 void iso8583_init(isomsg *m)	
 {
 	int i;
-
+	m->bmp_flag = 0; 				/*!	Default format is binary format */
 	for (i = 0; i <= 128; i++) {
 		m->fld[i] = NULL;
 	}
 }
 
-/*!	\fn 	int iso8583_fmtbitmap(isomsg *m, int bmp_flag)
- *		\brief  set the bitmap flag for the isomsg struct m
- *  
- * 		\param		m is an ::isomsg structure pointer that contains all message elements to be packed or unpacked
- * 		\param		bmp_flag is the flag used to identify whether the bitmap is in hexa format (bmp_flag=1) or binary format (bmp_flag=0) 
- * 		\return		error code
- */ 
-int iso8583_set_fmtbitmap(isomsg *m, int bmp_flag){
-}
-
-/*!	\fn 	int iso8583_get_bitmap(isomsg *m, char *buf, char* bitmap)
- *		\brief  This function used to get the bitmap out of the message buffer
- * 
- * 		\param		m is an ::isomsg structure pointer that contains all message elements to be packed or unpacked
- * 		\param		buf is the iso message buffer that contains the packed iso message.
- * 		\param		bimap is the output bitmap 
- * 		\return		error code
- */
-int iso8583_get_bitmap(isomsg *m, char *buf){
-}
 
 /*!	\fn 	int iso8583_pack(const isomsg *m, const isodef *d, char *buf)
  *		\brief  Using the definition d, pack the content of the ISO message m into buf. \n
@@ -57,7 +38,9 @@ int iso8583_pack(const isomsg *m, const isodef *d, char *buf)
 	char *bitmap;
 	int len;
 	char tmp[20];
+	Bytes byte_tmp, hexa_tmp;
 	int flderr[129]
+
 
 	/* Field 0 is mandatory and fixed length. */
 	           for (i = 0; i < 129; i++)
@@ -108,8 +91,17 @@ int iso8583_pack(const isomsg *m, const isodef *d, char *buf)
 			bitmap[(i-1)/8] |= 0x80 >> ((i-1)%8);
 		}
 	}
-	memcpy(buf, bitmap, flds/8);
-	buf += flds/8;
+	
+	if(m->bmp_flag == BMP_BINARY){
+		memcpy(buf, bitmap, flds/8);
+		buf += flds/8;
+	}else{
+		byte_tmp.length = flds/8;
+		byte_tmp.bytes = (char*) calloc(byte_tmp.length, sizeof(char));
+		bytes2hexachars(&byte_tmp, &hexa_tmp);
+		memcpy(buf, hexa_tmp.bytes, hexa_tmp.length);
+		buf += hexa_tmp.length; 
+	}
 
 	for (i = 2; i <= flds; i++) {
 		if ((bitmap[(i-1)/8] << ((i-1)%8)) & 0x80) { /* i'th bit != 0 */
@@ -181,8 +173,10 @@ int iso8583_unpack(isomsg *m, const isodef *d, const char *buf)
 	int flds;
 	int i;
 	int len;
-	int flderr[129]
-        char tmp[20];
+    char tmp[20];
+    Bytes byte_tmp, hexa_tmp;
+    int flderr[129];
+    
 	for (i = 0; i < 129; i++)
 	{
 		flderr[i] = 0;
@@ -210,9 +204,22 @@ int iso8583_unpack(isomsg *m, const isodef *d, const char *buf)
 	} else {
 		flds = 64;
 	}
-	m->fld[1] = (char *) calloc(flds/8 + 1, sizeof(char));
-	memcpy(m->fld[1], buf, flds/8);
-	buf += flds/8;
+	
+	if(m->bmp_flag == BMP_BINARY){
+		m->fld[1] = (char *) calloc(flds/8 + 1, sizeof(char));
+		memcpy(m->fld[1], buf, flds/8);
+		buf += flds/8;		
+	}else{					
+		hexa_tmp.length = flds/4;	
+		hexa_tmp.bytes = (char *) calloc(hexa_tmp.length, sizeof(char));
+		memcpy(byte_tmp.bytes, buf, flds/4);
+		hexachars2bytes(&hexa_tmp, &byte_tmp);
+		m->fld[1] = (char*) calloc(byte_tmp.length, sizeof(char));
+		memcpy(m->fld[1], byte_tmp.bytes, byte_tmp.length);
+		buf += flds/4;
+	}
+	
+	
 
 	for (i = 2; i <= flds; i++) {
 		if ((m->fld[1][(i-1)/8] << ((i-1)%8)) & 0x80) { /* i'th bit != 0 */
@@ -301,12 +308,13 @@ void isoerrreport(int *fldErr, FILE *fp)
     time_t t;
     int i, j;
     t = time(0);
+
     fprintf(fp, "The debug error for day: %s", ctime(&t));
     for(i=0; i<129; i++)
     {
     	if fldErr(i) != 0 then
     	{
-    		/*Searching for the desc of this error*/
+
     		j = 0;
     		while (errdef(j) != null)
     		{
