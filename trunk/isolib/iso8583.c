@@ -66,7 +66,8 @@ int iso8583_pack(const isomsg *m, const isodef *d, char *buf)
 	           }
 	if (strlen(m->fld[0]) != d[0].flds || d[0].lenflds != 0) {
 		/* FIXME: error */
-		/*This error is the length of field is too long*/
+		/*This error is the length of field is not correct*/
+		flderr[i] = 2
 	}
 	memcpy(buf, m->fld[0], d[0].flds);
 	buf += d[0].flds;
@@ -121,6 +122,8 @@ int iso8583_pack(const isomsg *m, const isodef *d, char *buf)
 					sprintf(buf, tmp, len);
 					if (len > d[i].flds) {
 						/* FIXME: error */
+						/*The length of this field is too long*/
+						flderr[i] = 2
 					}
 					buf += d[i].lenflds;
 					break;
@@ -178,8 +181,12 @@ int iso8583_unpack(isomsg *m, const isodef *d, const char *buf)
 	int flds;
 	int i;
 	int len;
+	int flderr[129]
         char tmp[20];
-
+	for (i = 0; i < 129; i++)
+	{
+		flderr[i] = 0;
+	}
 	/* Field 0 is mandatory and fixed length. */
 	if (d[0].lenflds != 0) {
 		/* FIXME: error */
@@ -218,7 +225,8 @@ int iso8583_unpack(isomsg *m, const isodef *d, const char *buf)
 				 */
 				if (len > d[i].flds) {
 					/* FIXME: warning/error */
-					
+					/*The length of this field is to long*/
+					flderr[i] = 2;
 				}
 			} else { /* Fixed length */
 				len = d[i].flds;
@@ -236,6 +244,8 @@ int iso8583_unpack(isomsg *m, const isodef *d, const char *buf)
 				break;
 			default:
 				/* FIXME: error */
+				/*The format of this field is not correct*/
+				flderr[i] = 3;
 				break;
 			}
 
