@@ -12,9 +12,14 @@
 #define ISO_ALPHANUMERIC 2
 #define ISO_BINARY       3
 
+<<<<<<< .mine
+#define IS_FIXED_LEN(def,idx) (def[(idx)].lenflds==0)
+
+=======
 #define BMP_BINARY		0
 #define BMP_HEXA			1
 
+>>>>>>> .r23
 /*!	\struct		isodef
  * 		\brief		The structure holds all data delement definitions of an iso8583 version.  		
  */
@@ -336,4 +341,12 @@ void isoerrreport(int *fldErr, FILE *fp);
 void iso8583_dump(FILE *fp, isomsg *m);
 void iso8583_free(isomsg *m);
 
+<<<<<<< .mine
+/*!	\func	set data to a field of iso msg	*/
+int iso8583_set_field(isomsg* msg, const isodef *def, int idx, void* fld);
+/*!	\func	get data from a field of iso msg	*/
+int iso8583_get_field(const char* buf, const isodef *def, int idx, void* fld);
+
+=======
+>>>>>>> .r23
 #endif /* iso8583.h */

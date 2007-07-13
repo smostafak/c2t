@@ -6,8 +6,57 @@
 #include "iso8583.h"
 #include "utilities.h"
 
+<<<<<<< .mine
+/*!	\fn	char *lpad(char *s, int len, char ch);		 
+ * 		\brief	
+ * 		\param	s is a pointer to a string
+ * 		\param  len is number 
+ * 		\param  ch is character fill    
+ */
+char *lpad(char *s, int len, char ch)
+{
+    int i = strlen(s);
+
+    if (i >= len) return(s);
+    memmove(s+len-i,s,(size_t)(i+1));
+    memset(s,ch,(size_t)(len-i));
+    return s;
+}
+
+/*!	\fn	char *rpad(char *s, int len, char ch);		 
+ * 		\brief	
+ * 		\param	s is a pointer to a string
+ * 		\param  len is number 
+ * 		\param  ch is character fill    
+ */
+char *rpad(char *s, int len, char ch);		
+{
+    int i = strlen(s);
+
+    if (i >= len) return(s);
+    memset(s+i, ch, (size_t)(len - i));
+    return s;
+}
+
+/*!	\fn	void setdata(isomsg *m, char *buff ); 
+ * 		\brief	set data to a field 
+ * 		\param	m is a pointer to a isomsg
+ * 		\param  buff is a pointer to byte string     
+ */
+void setdata(isomsg *m, int idx, char *buff );		
+{
+    if (idx >= 1 && idx <= 129) {
+    	int len = strlen(buff);
+    	m->fld[idx] = (char *)malloc(len);
+    	memcpy(m->fld[idx], buff, len);
+    }
+}
 
 
+=======
+
+
+>>>>>>> .r23
 /*!	\fn	void iso8583_init(isomsg *m);			 
  * 		\brief	Initialize an ISO message struct - i.e. set all entries to NULL
  * 		\param	m is an ::isomsg   
@@ -330,4 +379,45 @@ void iso8583_free(isomsg *m)
     }
     fclose(fp);
 }*/
+
+/*!	\fn			int iso8583_set_field(isomsg* msg, const isodef *def, int idx, void* fld)
+ *  	\brief		set data to a field of iso msg. 
+ */
+void int iso8583_set_field(isomsg* msg, const isodef *def, int idx, void* fld)
+{	
+	if (idx > 129 || idx < 1)
+		/*
+		 * The value of idx must be between 1 and 129
+		 */
+		return -1; //Invalid field
+	
+	int format def[idx].format; 
+	
+	switch (format) {
+	case ISO_BITMAP:
+		break;
+		case ISO_NUMERIC:			
+			char numchar[100];			
+			sprintf(numchar,"%ld",(long)*fld);
+			int len = strlen(numchar);
+		    
+			if (len > def[idx].flds)
+			/*
+			 * The length of this field too long			 
+			 */
+				return 3; //error code
+			if (IS_FIXED_LEN(def,idx)) {
+				lpad(numchar, def[idx].flds, '0');
+			}
+			break;
+		case ISO_ALPHANUMERIC:
+			break;
+		case ISO_BINARY:
+			break;
+		default:
+			return -1;//invalid format
+	}	
+	
+	return 0;
+}
 
