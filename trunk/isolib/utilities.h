@@ -36,4 +36,21 @@ char	int2hexachar(int );
 int bytes2hexachars(Bytes*, Bytes*);
  
 int	int2bin(unsigned int);
+
+/*!	\fn	char *lpad(char *s, int len, char ch);		 
+ * 		\brief	
+ * 		\param	s is a pointer to a string
+ * 		\param  len is number 
+ * 		\param  ch is character fill    
+ */
+char *lpad(char *s, int len, char ch);
+
+/*!	\fn	char *rpad(char *s, int len, char ch);		 
+ * 		\brief	
+ * 		\param	s is a pointer to a string
+ * 		\param  len is number 
+ * 		\param  ch is character fill    
+ */
+char *rpad(char *s, int len, char ch);	
+
 #endif /*UTILITIES_H_*/
