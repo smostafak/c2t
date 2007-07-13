@@ -6,6 +6,8 @@
 #include "iso8583.h"
 #include "utilities.h"
 
+
+
 /*!	\fn	void iso8583_init(isomsg *m);			 
  * 		\brief	Initialize an ISO message struct - i.e. set all entries to NULL
  * 		\param	m is an ::isomsg   
@@ -39,18 +41,18 @@ int iso8583_pack(const isomsg *m, const isodef *d, char *buf)
 	int len;
 	char tmp[20];
 	Bytes byte_tmp, hexa_tmp;
-	int flderr[129]
+	int flderr[129];
 
 
 	/* Field 0 is mandatory and fixed length. */
 	           for (i = 0; i < 129; i++)
 	           {
-	        	   flderr[i] = 0
+	        	   flderr[i] = 0;
 	           }
 	if (strlen(m->fld[0]) != d[0].flds || d[0].lenflds != 0) {
 		/* FIXME: error */
 		/*This error is the length of field is not correct*/
-		flderr[i] = 2
+		flderr[i] = 2;
 	}
 	memcpy(buf, m->fld[0], d[0].flds);
 	buf += d[0].flds;
@@ -115,7 +117,7 @@ int iso8583_pack(const isomsg *m, const isodef *d, char *buf)
 					if (len > d[i].flds) {
 						/* FIXME: error */
 						/*The length of this field is too long*/
-						flderr[i] = 2
+						flderr[i] = 2;
 					}
 					buf += d[i].lenflds;
 					break;
@@ -212,14 +214,12 @@ int iso8583_unpack(isomsg *m, const isodef *d, const char *buf)
 	}else{					
 		hexa_tmp.length = flds/4;	
 		hexa_tmp.bytes = (char *) calloc(hexa_tmp.length, sizeof(char));
-		memcpy(byte_tmp.bytes, buf, flds/4);
+		memcpy(hexa_tmp.bytes, buf, flds/4);
 		hexachars2bytes(&hexa_tmp, &byte_tmp);
-		m->fld[1] = (char*) calloc(byte_tmp.length, sizeof(char));
-		memcpy(m->fld[1], byte_tmp.bytes, byte_tmp.length);
+		m->fld[1] = (char*) calloc(byte_tmp.length/8 + 1, sizeof(char));
+		memcpy(m->fld[1], byte_tmp.bytes, byte_tmp.length/8);
 		buf += flds/4;
 	}
-	
-	
 
 	for (i = 2; i <= flds; i++) {
 		if ((m->fld[1][(i-1)/8] << ((i-1)%8)) & 0x80) { /* i'th bit != 0 */
@@ -303,7 +303,7 @@ void iso8583_free(isomsg *m)
 /*!	\fn			isoerrreport(int *fldErr, FILE *fp)
  *  	\brief		Show the message error to the logfile. 
  */
-void isoerrreport(int *fldErr, FILE *fp)
+/*void isoerrreport(int *fldErr, FILE *fp)
 {
     time_t t;
     int i, j;
@@ -312,13 +312,13 @@ void isoerrreport(int *fldErr, FILE *fp)
     fprintf(fp, "The debug error for day: %s", ctime(&t));
     for(i=0; i<129; i++)
     {
-    	if fldErr(i) != 0 then
+    	if (fldErr(i) != 0)
     	{
 
     		j = 0;
     		while (errdef(j) != null)
     		{
-    			if fleErr[i] = errdef(j)
+    			if (fleErr[i] == errdef(j))
     			{
     				fprintf(fp, "Error appear on the field %d is: %s", i, errdef[j].desc);
     				break;
@@ -328,6 +328,6 @@ void isoerrreport(int *fldErr, FILE *fp)
     	    
     	}
     }
-    fclose(fp)
-}
+    fclose(fp);
+}*/
 

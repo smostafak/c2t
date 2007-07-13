@@ -19,7 +19,7 @@ int	hexachar2int(char hexa_char){
 		if( isdigit(hexa_char))
 			return hexa_char - '0';
 		else
-			return hexa_char - 'a' + 10 ;
+			return tolower(hexa_char) - 'a' + 10 ;
 	}else{
 		return -1;
 	}

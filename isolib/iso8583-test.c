@@ -204,6 +204,8 @@ isodef pbsmg20[] = {
     /*127*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for private use"},
     /*128*/ {ISO_BINARY, 0, 8, "Message authentication code field"}
 };
+
+
 	int i, len;
 	char *buf;
 	FILE *fp;
