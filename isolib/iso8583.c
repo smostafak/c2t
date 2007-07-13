@@ -17,7 +17,7 @@ void setdata(isomsg *m, int idx, char *buff );
 {
     if (idx >= 1 && idx <= 129) {
     	int len = strlen(buff);
-    	m->fld[idx] = (char *)malloc(len);
+    	m->fld[idx] = (char *)malloc((len + 1)*sizeof(char));
     	memcpy(m->fld[idx], buff, len);
     }
 }
