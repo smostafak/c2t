@@ -136,3 +136,34 @@ int	int2bin(unsigned int in){
 	printf("\n %s \n", out);
 	return 0;
 }
+
+/*!	\fn	char *lpad(char *s, int len, char ch);		 
+ * 		\brief	
+ * 		\param	s is a pointer to a string
+ * 		\param  len is number 
+ * 		\param  ch is character fill    
+ */
+char *lpad(char *s, int len, char ch)
+{
+    int i = strlen(s);
+
+    if (i >= len) return(s);
+    memmove(s+len-i,s,(size_t)(i+1));
+    memset(s,ch,(size_t)(len-i));
+    return s;
+}
+
+/*!	\fn	char *rpad(char *s, int len, char ch);		 
+ * 		\brief	
+ * 		\param	s is a pointer to a string
+ * 		\param  len is number 
+ * 		\param  ch is character fill    
+ */
+char *rpad(char *s, int len, char ch);		
+{
+    int i = strlen(s);
+
+    if (i >= len) return(s);
+    memset(s+i, ch, (size_t)(len - i));
+    return s;
+}
