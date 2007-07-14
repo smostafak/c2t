@@ -343,9 +343,9 @@ void iso8583_free(isomsg *m);
 
 <<<<<<< .mine
 /*!	\func	set data to a field of iso msg	*/
-int iso8583_set_field(isomsg* msg, const isodef *def, int idx, void* fld);
+int iso8583_set_field(isomsg* msg, const isodef *def, int idx, void* fld, int len);
 /*!	\func	get data from a field of iso msg	*/
-int iso8583_get_field(const char* buf, const isodef *def, int idx, void* fld);
+int iso8583_get_field(const char* buf, const isodef *def, int idx, void* fld, int *len);
 
 =======
 >>>>>>> .r23
