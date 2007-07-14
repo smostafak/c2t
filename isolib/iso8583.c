@@ -8,18 +8,20 @@
 
 <<<<<<< .mine
 
-/*!	\fn	void setdata(isomsg *m, char *buff ); 
+/*!	\fn	int setdata(isomsg *m, char *buff ); 
  * 		\brief	set data to a field 
  * 		\param	m is a pointer to a isomsg
  * 		\param  buff is a pointer to byte string     
  */
-void set_data(isomsg *msg, int idx, char *buff );		
+int set_data(isomsg *msg, int idx, char *buff );		
 {
     if (idx >= 1 && idx <= 129) {
     	int len = strlen(buff);
     	m->fld[idx] = (char *)malloc((len + 1)*sizeof(char));
+    	if (m->fld[idx] == NULL) return ERR_OUTMEM;    	
     	memcpy(m->fld[idx], buff, len);
     }
+    return 0;
 }
 
 
@@ -359,14 +361,15 @@ void int int iso8583_set_field(isomsg* msg, const isodef *def, int idx, void* fl
 		/*
 		 * The value of idx must be between 1 and 129
 		 */
-		return -1; //Invalid field
+		return ERR_IVLFLD; //Invalid field
 	
 	int format def[idx].format; 
 	
 	switch (format) {
 		case ISO_BITMAP:
 			break;
-		case ISO_NUMERIC:			
+		case ISO_NUMERIC:		
+			if (len != )
 			char numchar[100];	
 			/*Convert to number characters*/
 			sprintf(numchar,"%ld",(long)*fld);
@@ -376,7 +379,7 @@ void int int iso8583_set_field(isomsg* msg, const isodef *def, int idx, void* fl
 			/*
 			 * The length of this field too long			 
 			 */
-				return 3; //error code
+				return ERR_OVRLEN; //error code
 			if (IS_FIXED_LEN(def,idx)) {
 				lpad(numchar, def[idx].flds, '0');
 			}
@@ -389,7 +392,6 @@ void int int iso8583_set_field(isomsg* msg, const isodef *def, int idx, void* fl
 			return -1;//invalid format		
 	}	
 	
-	set_data(msg,idx,numchar);
-	return 0;
+	return set_data(msg,idx,numchar);	
 }
 
