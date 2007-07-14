@@ -13,7 +13,7 @@
  * 		\param	m is a pointer to a isomsg
  * 		\param  buff is a pointer to byte string     
  */
-void setdata(isomsg *m, int idx, char *buff );		
+void set_data(isomsg *m, int idx, char *buff );		
 {
     if (idx >= 1 && idx <= 129) {
     	int len = strlen(buff);
@@ -353,7 +353,7 @@ void iso8583_free(isomsg *m)
 /*!	\fn			int iso8583_set_field(isomsg* msg, const isodef *def, int idx, void* fld)
  *  	\brief		set data to a field of iso msg. 
  */
-void int iso8583_set_field(isomsg* msg, const isodef *def, int idx, void* fld)
+void int int iso8583_set_field(isomsg* msg, const isodef *def, int idx, void* fld, int len)
 {	
 	if (idx > 129 || idx < 1)
 		/*
@@ -364,8 +364,8 @@ void int iso8583_set_field(isomsg* msg, const isodef *def, int idx, void* fld)
 	int format def[idx].format; 
 	
 	switch (format) {
-	case ISO_BITMAP:
-		break;
+		case ISO_BITMAP:
+			break;
 		case ISO_NUMERIC:			
 			char numchar[100];			
 			sprintf(numchar,"%ld",(long)*fld);
