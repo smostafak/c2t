@@ -337,7 +337,6 @@ int iso8583_set_fmtbitmap(isomsg *m, int bmp_flag);
 int iso8583_get_bitmap(isomsg *m, isodef* def, char *buf);
 int iso8583_pack(const isomsg *m, const isodef *d, char *buf);
 int iso8583_unpack(isomsg *m, const isodef *d, const char *buf);
-void isoerrreport(int *fldErr, FILE *fp);
 void iso8583_dump(FILE *fp, isomsg *m);
 void iso8583_free(isomsg *m);
 
