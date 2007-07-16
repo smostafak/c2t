@@ -1,19 +1,49 @@
 /*!	\file	iso8583.c
  * 		\brief	The main source file of this library 
  */
+ 
 #include <stdlib.h> 
 #include <string.h>
 #include "iso8583.h"
 #include "utilities.h"
+#include "errors.h"
 
-<<<<<<< .mine
+/*!	\fn	char *lpad(char *s, int len, char ch);		 
+ * 		\brief	
+ * 		\param	s is a pointer to a string
+ * 		\param  len is number 
+ * 		\param  ch is character fill    
+ */
+char *lpad(char *s, int len, char ch)
+{
+    int i = strlen(s);
+
+    if (i >= len) return(s);
+    memmove(s+len-i,s,(size_t)(i+1));
+    memset(s,ch,(size_t)(len-i));
+    return s;
+}
+
+/*!	\fn	char *rpad(char *s, int len, char ch);		 
+ * 		\brief	
+ * 		\param	s is a pointer to a string
+ * 		\param  len is number 
+ * 		\param  ch is character fill    
+ */
+char *rpad(char *s, int len, char ch)		
+{
+    int i = strlen(s);	
+    if (i >= len) return(s);
+    memset(s+i, ch, (size_t)(len - i));        
+    return s;    
+}
 
 /*!	\fn	int setdata(isomsg *m, char *buff ); 
  * 		\brief	set data to a field 
  * 		\param	m is a pointer to a isomsg
  * 		\param  buff is a pointer to byte string     
  */
-int set_data(isomsg *msg, int idx, char *buff );		
+int set_data(isomsg *msg, int idx, char *buff )
 {
     if (idx >= 1 && idx <= 129) {
     	int len = strlen(buff);
@@ -24,11 +54,6 @@ int set_data(isomsg *msg, int idx, char *buff );
     return 0;
 }
 
-
-=======
-
-
->>>>>>> .r23
 /*!	\fn	void iso8583_init(isomsg *m);			 
  * 		\brief	Initialize an ISO message struct - i.e. set all entries to NULL
  * 		\param	m is an ::isomsg   
@@ -119,8 +144,9 @@ int iso8583_pack(const isomsg *m, const isodef *d, char *buf)
 		memcpy(buf, bitmap, flds/8);
 		buf += flds/8;
 	}else{
-		byte_tmp.length = flds/8;
+		byte_tmp.length = flds;
 		byte_tmp.bytes = (char*) calloc(byte_tmp.length, sizeof(char));
+		memcpy(byte_tmp.bytes, bitmap, byte_tmp.length/8);
 		bytes2hexachars(&byte_tmp, &hexa_tmp);
 		memcpy(buf, hexa_tmp.bytes, hexa_tmp.length);
 		buf += hexa_tmp.length; 
@@ -355,15 +381,18 @@ void iso8583_free(isomsg *m)
 /*!	\fn			int iso8583_set_field(isomsg* msg, const isodef *def, int idx, void* fld)
  *  	\brief		set data to a field of iso msg. 
  */
-void int int iso8583_set_field(isomsg* msg, const isodef *def, int idx, void* fld, int len)
+
+int iso8583_set_field(isomsg* msg, const isodef *def, int idx, void* fld, int len)
 {	
-	if (idx > 129 || idx < 1)
+	int format;
+	
+	if ((idx > 129) || (idx < 1))
 		/*
 		 * The value of idx must be between 1 and 129
 		 */
 		return ERR_IVLFLD; //Invalid field
 	
-	int format def[idx].format; 
+	format= def[idx].format; 
 	
 	switch (format) {
 		case ISO_BITMAP:
