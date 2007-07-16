@@ -347,37 +347,6 @@ void iso8583_free(isomsg *m)
 		}
 	}
 }
-/*!	\fn			isoerrreport(int *fldErr, FILE *fp)
- *  	\brief		Show the message error to the logfile. 
- */
-/*void isoerrreport(int *fldErr, FILE *fp)
-{
-    time_t t;
-    int i, j;
-    t = time(0);
-
-    fprintf(fp, "The debug error for day: %s", ctime(&t));
-    for(i=0; i<129; i++)
-    {
-    	if (fldErr(i) != 0)
-    	{
-
-    		j = 0;
-    		while (errdef(j) != null)
-    		{
-    			if (fleErr[i] == errdef(j))
-    			{
-    				fprintf(fp, "Error appear on the field %d is: %s", i, errdef[j].desc);
-    				break;
-    			}
-    			j = j + 1;
-    		}
-    	    
-    	}
-    }
-    fclose(fp);
-}*/
-
 /*!	\fn			int iso8583_set_field(isomsg* msg, const isodef *def, int idx, void* fld)
  *  	\brief		set data to a field of iso msg. 
  */
