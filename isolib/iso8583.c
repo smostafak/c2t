@@ -347,11 +347,11 @@ void free_message(isomsg *m)
 		}
 	}
 }
-/*!	\fn			int iso8583_set_field(isomsg* msg, const isodef *def, int idx, void* fld)
+/*!	\fn			int set_field(isomsg* msg, const isodef *def, int idx, void* fld)
  *  	\brief		set data to a field of iso msg. 
  */
 
-int iso8583_set_field(isomsg* msg, const isodef *def, int idx, void* fld, int len)
+int set_field(isomsg* msg, const isodef *def, int idx, void* fld, int len)
 {	
 	int format;
 	
