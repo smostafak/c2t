@@ -24,7 +24,7 @@ const errmsg errdef[] ={
  */
 void err_iso(int *fldErr, FILE *fp)
 
-void err_field(int err_code, int fld_idx)
+char *err_field(int err_code, int fld_idx)
 /*!	\fn	void err_iso(int *fldErr, FILE *fp)		 
  * 		\brief	this procedure is call when having error during field setting
  * 		\param	err_code is the return value of the function iso8583_set_fmtbitmap
