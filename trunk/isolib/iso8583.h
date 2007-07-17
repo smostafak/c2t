@@ -59,9 +59,9 @@ void dump_message(FILE *fp, isomsg *m);
 void free_message(isomsg *m);
 
 /*!	\func	set data to a field of iso msg	*/
-int iso8583_set_field(isomsg* msg, const isodef *def, int idx, void* fld, int len);
+int set_field(isomsg* msg, const isodef *def, int idx, void* fld, int len);
 /*!	\func	get data from a field of iso msg	*/
-int iso8583_get_field(const char* buf, const isodef *def, int idx, void* fld, int *len);
+int get_field(const char* buf, const isodef *def, int idx, void* fld, int *len);
 
 
 #endif /* iso8583.h */
