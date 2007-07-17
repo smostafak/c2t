@@ -8,42 +8,12 @@
 #include "utilities.h"
 #include "errors.h"
 
-/*!	\fn	char *lpad(char *s, int len, char ch);		 
- * 		\brief	
- * 		\param	s is a pointer to a string
- * 		\param  len is number 
- * 		\param  ch is character fill    
- */
-char *lpad(char *s, int len, char ch)
-{
-    int i = strlen(s);
-
-    if (i >= len) return(s);
-    memmove(s+len-i,s,(size_t)(i+1));
-    memset(s,ch,(size_t)(len-i));
-    return s;
-}
-
-/*!	\fn	char *rpad(char *s, int len, char ch);		 
- * 		\brief	
- * 		\param	s is a pointer to a string
- * 		\param  len is number 
- * 		\param  ch is character fill    
- */
-char *rpad(char *s, int len, char ch)		
-{
-    int i = strlen(s);	
-    if (i >= len) return(s);
-    memset(s+i, ch, (size_t)(len - i));        
-    return s;    
-}
-
 /*!	\fn	int setdata(isomsg *m, char *buff ); 
  * 		\brief	set data to a field 
  * 		\param	m is a pointer to a isomsg
  * 		\param  buff is a pointer to byte string     
  */
-int set_data(isomsg *m, int idx, char *buff )
+static int set_data(isomsg *m, int idx, char *buff )
 {
     if (idx >= 1 && idx <= 129) {
     	int len = strlen(buff);
