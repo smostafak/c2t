@@ -279,7 +279,6 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 			buf += len;
 		}
 	}
-
 	return 0;
 }
 
@@ -358,7 +357,6 @@ int set_field(isomsg* msg, const isodef *def, int idx, void* fld, int len)
 		default:
 			return -1;//invalid format		
 	}	
-	
 	return set_data(msg,idx,numchar);	
 }
 
