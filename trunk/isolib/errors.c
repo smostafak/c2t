@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <ctype.h>
 #include "errors.h"
 /*!	\fn			isoerrreport(int *fldErr, char *filename)
  *  	\brief		Show the message error to the logfile. 
@@ -87,4 +88,62 @@ char *err_field(int err_code)
 	{
 		return desc;
 	}
+}
+
+/*!	\fn	check_fld(char *value, int idx, cons isodef *def)		 
+ * 		\brief	this procedure is call to check weather a field is correct or not (pack and unpack)
+ * 		\param	value: the value of this field (is set or get from msg)
+ * 		\param idx: the possition of this field in msg
+ * 		\param def: the definition is used to parse msg
+ * 		\output: the errors code if have or zero (not error)
+*/
+int check_fld(char *value, int idx, cons isodef *def)
+{
+	int i, err_code;
+	int lengthfld; //The length of the value
+	
+	lengthfld = strlen(value)
+	if (def[i].format == ISO_BITMAP)
+	{
+		err_code = 0;
+	}
+	else if (def[i].format == ISO_NUMERIC)
+	{
+		for (i = 0; i < lengthfld; i++)
+		{
+			if (isdigit(value[i]) == 0)
+			{
+				err_code = 5;
+				break;
+			}
+		}
+	}
+	else if (def[i].format == ISO_ALPHANUMERIC)
+	{
+		for (i = 0; i < lengthfld; i++)
+		{
+			if (isalnum(value[i]) == 0)
+			{
+				err_code = 5;
+				break;
+			}
+		}
+	}
+	else if (def[i].format == ISO_BINARY)
+	{
+		for (i = 0; i < lengthfld; i++)
+		{
+			if ((value[i] != '0') && (value[i] != '1'))
+			{
+				err_code = 5;
+				break;
+			}
+		}
+	}
+	else
+	{
+		//format of this field is not defined
+		err_code = 3;
+	}
+	return err_code;
 }
