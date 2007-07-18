@@ -30,13 +30,13 @@ const errmsg errdef[] ={
  * 		\param	err_code is the return value of the function iso8583_set_fmtbitmap
 */
 void err_iso(int *fldErr, char *filename)
-//char *err_field(int err_code, int fld_idx)
+//char *scan_err(int err_code, int fld_idx)
 /*!	\fn	void err_iso(int *fldErr, FILE *fp)		 
  * 		\brief	this procedure is call when having error during field setting
  * 		\param	err_code is the return value of the function iso8583_set_fmtbitmap
  * 		\param  fld_idx point to the field error 
  */
-char *err_field(int err_code)
+char *scan_err(int err_code)
 
 /*!	\fn	check_fld(char *value, int idx, cons isodef *def)		 
  * 		\brief	this procedure is call to check weather a field is correct or not (pack and unpack)

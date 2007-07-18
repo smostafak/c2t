@@ -65,7 +65,7 @@ char *err_field(int err_code, int fld_idx)
  * 		\Output: description about the error
  */
 
-char *err_field(int err_code)
+char *scan_err(int err_code)
 {
 	int i;
 	char *desc;
