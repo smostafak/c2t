@@ -87,5 +87,4 @@ char *err_field(int err_code)
 	{
 		return desc;
 	}
-	}
 }

@@ -272,7 +272,6 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 				flderr[i] = 3;
 				break;
 			}
-
 			m->fld[i] = (char *) malloc((len + 1) * sizeof(char));
 			memcpy(m->fld[i], buf, len);
 			m->fld[i][len] = 0;
