@@ -8,12 +8,14 @@
 #include <time.h>
 #include <ctype.h>
 #include "errors.h"
-/*!	\fn			isoerrreport(int *fldErr, char *filename)
- *  	\brief		Show the message error to the logfile. 
+/*!	\fn	void err_iso(int *fldErr, char *filename)
+ *  	\brief	Show the message error to the logfile. 
  * 		\param fldErr: the array contains all errors in message
  * 		\param filename: the name of log file
  * 		\Output: the log file write error in message
  */
+
+
 void err_iso(int *fldErr, char *filename)
 {
 	time_t t;
@@ -27,7 +29,7 @@ void err_iso(int *fldErr, char *filename)
     }
     t = time(0);
     fprintf(fp, "The debug error for day: %s", ctime(&t));
-    for(i=0; i<129; i++)
+    for(i = 0; i < 129; i++)
     {
     	if (fldErr(i) != 0)
     	{
@@ -47,19 +49,9 @@ void err_iso(int *fldErr, char *filename)
     fclose(fp);
 }
 
-/*!	\fn	void err_iso(int *fldErr, FILE *fp)		 
- * 		\brief	this procedure is call when having error during field setting
- * 		\param	err_code is the return value of the function iso8583_set_fmtbitmap
- * 		\param  fld_idx point to the field error 
- * 		\Output: description about the error
- */
-/*
-char *err_field(int err_code, int fld_idx)
-{
 
-}*/
 
-/*!	\fn	void err_iso(int *fldErr, FILE *fp)		 
+/*!	\fn	char *scan_err(int *fldErr, FILE *fp)		 
  * 		\brief	this procedure is call when having error during field setting
  * 		\param	err_code is the return value of the function iso8583_set_fmtbitmap
  * 		\Output: description about the error
@@ -75,7 +67,7 @@ char *scan_err(int err_code)
 		if (errdef[i].Err_ID = err_code)
 		{
 			desc = (char *) malloc(strlen(errdef[i].desc) * sizeof(char));
-			strcpy(desc, errdef[i].desc)
+			strcpy(desc, errdef[i].desc);
 			break;
 		}
 		i++;
