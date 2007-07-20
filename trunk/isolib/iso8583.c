@@ -58,6 +58,8 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 	char tmp[20];
 	Bytes byte_tmp, hexa_tmp;
 	int flderr[129];
+	char *filename;
+	filename = "./log.txt"
 
 
 	/* Field 0 is mandatory and fixed length. */
@@ -167,6 +169,10 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 					flderr[i] = 2;
 				}
 			}
+			if (flderr[i] == 0)
+			{
+				flderr[i] = check_fld(m->fld[i], i, d);
+			}
 
 			memcpy(buf, m->fld[i], len);
 
@@ -174,7 +180,7 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
                 }
 	}
 	/*write all error in this message to file*/
-	/*Call function isoerrrreport*/
+	err_iso(flderr, filename);
 	return (buf - start);
 }
 
@@ -193,6 +199,7 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 	int i;
 	int len;
     char tmp[20];
+    char *filename;
     Bytes byte_tmp, hexa_tmp;
     int flderr[129];
     
@@ -275,10 +282,20 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 			m->fld[i] = (char *) malloc((len + 1) * sizeof(char));
 			memcpy(m->fld[i], buf, len);
 			m->fld[i][len] = 0;
-
+			//Check the value of this field correct format or not
+			if (flderr[i] == 0)
+				flderr[i] = check_fld(m->fld[i], i, d);
 			buf += len;
 		}
 	}
+	filename = "./log.txt";
+	for (i = 0; i < 129; i++)
+		if (flderr[i] !=0)
+		{
+			err_iso(flderr, char filename);
+			break;
+		}
+	return set_data(msg,idx,numchar);
 	return 0;
 }
 
@@ -357,6 +374,5 @@ int set_field(isomsg* msg, const isodef *def, int idx, void* fld, int len)
 		default:
 			return -1;//invalid format		
 	}	
-	return set_data(msg,idx,numchar);	
 }
 

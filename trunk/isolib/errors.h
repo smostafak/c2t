@@ -26,17 +26,18 @@ const errmsg errdef[] ={
  */
 
 /*!	\fn	void err_iso(int *fldErr, FILE *fp)		 
- * 		\brief	this procedure is call when having error during field setting
- * 		\param	err_code is the return value of the function iso8583_set_fmtbitmap
+ * 		\brief this function is call to write the errors in msg to the log file
+ * 		\param	fldErr is an array that contains all errors in msg 8583
+ * 		\filename is name of log file
 */
-void err_iso(int *fldErr, char *filename)
+void err_iso(int *fldErr, char *filename);
 //char *scan_err(int err_code, int fld_idx)
-/*!	\fn	void err_iso(int *fldErr, FILE *fp)		 
- * 		\brief	this procedure is call when having error during field setting
+/*!	\fn	char *scan_err(int *fldErr, FILE *fp)		 
+ * 		\brief	This function is used to show the description of errors
  * 		\param	err_code is the return value of the function iso8583_set_fmtbitmap
- * 		\param  fld_idx point to the field error 
+ * 		\Output: one message to description the error
  */
-char *scan_err(int err_code)
+char *scan_err(int err_code);
 
 /*!	\fn	check_fld(char *value, int idx, cons isodef *def)		 
  * 		\brief	this procedure is call to check weather a field is correct or not (pack and unpack)
@@ -45,5 +46,5 @@ char *scan_err(int err_code)
  * 		\param def: the definition is used to parse msg
  * 		\output: the errors code if have or zero (not error)
 */
-int check_fld(char *value, int idx, cons isodef *def)
+int check_fld(char *value, int idx, cons isodef *def);
 #endif /*ERRORS_H_*/
