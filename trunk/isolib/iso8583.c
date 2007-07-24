@@ -70,7 +70,9 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 	if (strlen(m->fld[0]) != d[0].flds || d[0].lenflds != 0) {
 		/* FIXME: error */
 		/*This error is the length of field is not correct*/
-		flderr[i] = 2;
+		flderr[0] = 2;
+		err_iso(flderr, filename);
+		return 0;
 	}
 	memcpy(buf, m->fld[0], d[0].flds);
 	buf += d[0].flds;
@@ -88,6 +90,12 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 	}
 
 	bitmap = (char *) calloc(flds/8 + 1, sizeof(char));
+	if (!bitmap)
+	{
+		sys_err_code = 6;
+		err_sys(sys_err_code, syslog);
+		return 0;
+	}
 	/*
 	 * First bit in the bitmap (field 1) defines if the message is 
 	 * extended or not.
