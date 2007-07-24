@@ -28,7 +28,7 @@ void err_iso(int *fldErr, char *filename)
     	exit(1);
     }
     t = time(0);
-    fprintf(fp, "The debug error for day: %s", ctime(&t));
+    fprintf(fp, "<date %s>\n", ctime(&t));
     for(i = 0; i < 129; i++)
     {
     	if (fldErr(i) != 0)
@@ -38,7 +38,10 @@ void err_iso(int *fldErr, char *filename)
     		{
     			if (fleErr[i] == errdef(j).Err_ID)
     			{
-    				fprintf(fp, "Error appear on the field %d is: %s", i, errdef[j].desc);
+    				fprintf(fp, "	<field id = %d>\n", i);
+    				fprintf(fp, "		<err_code>%d>", i);
+    				fprintf(fp, "		</err_code>\n");
+    				fprintf(fp, "	</field>\n", i);
     				break;
     			}
     			j = j + 1;
@@ -46,6 +49,7 @@ void err_iso(int *fldErr, char *filename)
     	    
     	}
     }
+    fprintf(fp, "</date>", ctime(&t));
     fclose(fp);
 }
 
