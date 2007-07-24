@@ -52,15 +52,15 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 {
 	char *start = buf;
 	int flds;
-	int i;
+	int i, sys_err_code;
 	char *bitmap;
 	int len;
 	char tmp[20];
 	Bytes byte_tmp, hexa_tmp;
 	int flderr[129];
-	char *filename;
-	filename = "./log.txt"
-
+	char *filename, *syslog;
+	filename = "./log.txt";
+	syslog = "./syslog.txt"
 
 	/* Field 0 is mandatory and fixed length. */
 	           for (i = 0; i < 129; i++)
@@ -204,22 +204,34 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 {
 	int flds;
-	int i;
+	int i, sys_err_code;
 	int len;
     char tmp[20];
     char *filename;
+    char *syslog;
     Bytes byte_tmp, hexa_tmp;
     int flderr[129];
-    
 	for (i = 0; i < 129; i++)
 	{
 		flderr[i] = 0;
 	}
+	filename = "./log.txt";
+	syslog = "./syslog.txt"
 	/* Field 0 is mandatory and fixed length. */
 	if (d[0].lenflds != 0) {
 		/* FIXME: error */
+		flderr[0] = 2;
+		err_iso(flderr, filename);
+		return 0;
 	}
 	m->fld[0] = (char *) malloc((d[0].flds + 1) * sizeof(char));
+	if(!m->fld[0])
+	{
+		sys_err_code = 6;
+		//void err_sys(int err_code, char *filename);
+		err_sys(sys_err_code, syslog);
+		return 0;
+	}
 	memcpy(m->fld[0], buf, d[0].flds);
 	m->fld[0][d[0].flds] = 0;
 	buf += d[0].flds;
@@ -241,6 +253,13 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 	
 	if(m->bmp_flag == BMP_BINARY){
 		m->fld[1] = (char *) calloc(flds/8 + 1, sizeof(char));
+		if (!m->fld[1])
+		{
+			sys_err_code = 6;
+			//void err_sys(int err_code, char *filename);
+			err_sys(sys_err_code, syslog);
+			return 0;
+		}
 		memcpy(m->fld[1], buf, flds/8);
 		buf += flds/8;		
 	}else{					
@@ -249,6 +268,13 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 		memcpy(hexa_tmp.bytes, buf, flds/4);
 		hexachars2bytes(&hexa_tmp, &byte_tmp);
 		m->fld[1] = (char*) calloc(byte_tmp.length/8 + 1, sizeof(char));
+		if (!m->fld[1])
+		{
+			sys_err_code = 6;
+			//void err_sys(int err_code, char *filename);
+			err_sys(sys_err_code, syslog);
+			return 0;
+		}
 		memcpy(m->fld[1], byte_tmp.bytes, byte_tmp.length/8);
 		buf += flds/4;
 	}
@@ -292,6 +318,13 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 				break;
 			}
 			m->fld[i] = (char *) malloc((len + 1) * sizeof(char));
+			if (!m->fld[i])
+			{
+				sys_err_code = 6;
+				//void err_sys(int err_code, char *filename);
+				err_sys(sys_err_code, syslog);
+				return 0;
+			}
 			memcpy(m->fld[i], buf, len);
 			m->fld[i][len] = 0;
 			//Check the value of this field correct format or not
@@ -300,11 +333,10 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 			buf += len;
 		}
 	}
-	filename = "./log.txt";
 	for (i = 0; i < 129; i++)
 		if (flderr[i] !=0)
 		{
-			err_iso(flderr, char filename);
+			err_iso(flderr, filename);
 			break;
 		}
 	return set_data(msg,idx,numchar);
