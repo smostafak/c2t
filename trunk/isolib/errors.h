@@ -15,11 +15,12 @@ typedef struct {
 } errmsg;*/
 /*Define the const error of iso message*/
 const errmsg errdef[] ={
-		{1, ""}, /*The length of field is too long*/
-		{2, ""}, /*The length of field is not correct*/
-		{3, ""},  /*The format of this field is not define*/
-		{4, ""}	/*The index of field is out of range*/
-		{5,""} /*The value of this field is not correct format*/
+		{1, "The length of field is too long"}, /*The length of field is too long*/
+		{2, "The length of field is not correct"}, /*The length of field is not correct*/
+		{3, "The format of this field is not define"},  /*The format of this field is not define*/
+		{4, "The index of field is out of range"}	/*The index of field is out of range*/
+		{5,"The value of this field is not correct format"} /*The value of this field is not correct format*/
+		{6, "Out of memory"} /*Out of memory*/
 }; /*The format error*/
 /*!	\fn			isoerrreport(int *fldErr, FILE *fp)
  *  	\brief		Show the message error to the logfile. 
@@ -47,4 +48,12 @@ char *scan_err(int err_code);
  * 		\output: the errors code if have or zero (not error)
 */
 int check_fld(char *value, int idx, cons isodef *def);
+
+/*!	\fn	void *err_sys(int err_code, FILE *fp)		 
+ * 		\brief	This function is used to process the system error (such as out of memory ...)
+ * 		\param	err_code is the code of this error
+ * 		\param filename is the name of the log file for system error
+ * 		\Output: the desc of this error is written to log file (file name)
+ */
+void err_sys(int err_code, char *filename);
 #endif /*ERRORS_H_*/

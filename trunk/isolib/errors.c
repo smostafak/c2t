@@ -143,3 +143,26 @@ int check_fld(char *value, int idx, cons isodef *def)
 	}
 	return err_code;
 }
+/*!	\fn	void *err_sys(int err_code, FILE *fp)		 
+ * 		\brief	This function is used to process the system error (such as out of memory ...)
+ * 		\param	err_code is the code of this error
+ * 		\param filename is the name of the log file for system error
+ * 		\Output: the desc of this error is written to log file (file name)
+ */
+void err_sys(int err_code, char *filename);
+{
+	time_t t;
+	char *desc
+    file *fp;
+    fp = fopen(filename, "a+");
+    if (!fp)
+    {
+    	printf("Can not open file %s", filenamd);
+    	exit(1);
+    }
+    t = time(0);
+    fprintf(fp, "%s\n", ctime(&t));
+    desc = scan_err(err_code); 
+    fprintf(fp, "%s\n", desc);
+    fclose(fp);
+}
