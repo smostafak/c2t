@@ -15,7 +15,7 @@ typedef struct {
 } errmsg;*/
 /*Define the const error of iso message*/
 const errmsg errdef[] ={
-		{1, ""}, /*The length of field is to long*/
+		{1, ""}, /*The length of field is too long*/
 		{2, ""}, /*The length of field is not correct*/
 		{3, ""},  /*The format of this field is not define*/
 		{4, ""}	/*The index of field is out of range*/

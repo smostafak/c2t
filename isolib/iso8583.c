@@ -46,7 +46,7 @@ void init_message(isomsg *m)
  * 		\param		m is an ::isomsg structure pointer that contains all message elements to be packed
  * 		\param 	d is an array of ::isodef structures which refers to all data element definitions of  an iso standard
  * 		\param		buf is the iso message buffer that contains the packed iso message. 
- * 		\return		The length of the iso message buffer.
+ * 		\return		The length of the iso message buffer or zero if have errors.
  */
 int pack_message(const isomsg *m, const isodef *d, char *buf)
 {
@@ -135,8 +135,10 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 					sprintf(buf, tmp, len);
 					if (len > d[i].flds) {
 						/* FIXME: error */
-						/*The length of this field is too long*/
-						flderr[i] = 2;
+						/*The length of this field is too long*/					
+						flderr[i] = 1;
+						err_iso(flderr, filename);
+						return 0;
 					}
 					buf += d[i].lenflds;
 					break;
@@ -147,6 +149,8 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 						/* FIXME: error */
 						/*The length of field is not correct*/
 						flderr[i] = 1;
+						err_iso(flderr, filename);
+						return 0;
 					}
 					/* Copy length bytes from m->fld[i] */
 					len += d[i].lenflds;
@@ -156,6 +160,8 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 					/*The format error of this field*/
 					/*Format out of range*/
 					flderr[i] = 3;
+					err_iso(flderr, filename);
+					return 0;
 					break;
 				}
 			} else { /* Fixed length */
@@ -167,6 +173,8 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 					/* FIXME: error */
 					/*The lengthe is not correct*/
 					flderr[i] = 2;
+					err_iso(flderr, filename);
+					return 0;
 				}
 			}
 			if (flderr[i] == 0)
@@ -256,8 +264,10 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 				 */
 				if (len > d[i].flds) {
 					/* FIXME: warning/error */
-					/*The length of this field is to long*/
-					flderr[i] = 2;
+					/*The length of this field is too long*/
+					flderr[i] = 1;
+					err_iso(flderr, filename);
+					return 0;
 				}
 			} else { /* Fixed length */
 				len = d[i].flds;
@@ -277,6 +287,8 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 				/* FIXME: error */
 				/*The format of this field is not correct*/
 				flderr[i] = 3;
+				err_iso(flderr, filename);
+				return 0;
 				break;
 			}
 			m->fld[i] = (char *) malloc((len + 1) * sizeof(char));
