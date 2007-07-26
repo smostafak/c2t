@@ -37,22 +37,23 @@ void err_iso(int *fldErr, char *filename)
     	if (fldErr[i] != 0)
     	{
     		j = 0;
-    		while (!errdef(j))
+    		while (j < nerr)
     		{
-    			if (fldErr[i] == errdef(j).Err_ID)
-
+    			if (fldErr[i] == errdef[j].Err_ID)
     			{
 
     				fprintf(fp, "	<field id = %d>\n", i);
-    				fprintf(fp, "		<err_code>%d>", i);
+    				fprintf(fp, "		<err_code>%d>", fldErr[i]);
+    				fprintf(fp, "		</err_code>\n");
+    				fprintf(fp, "		<desc>%s>", errdef[i].dsc);
     				fprintf(fp, "		</err_code>\n");
     				fprintf(fp, "	</field>\n", i);
-
     				break;
     			}
+    			j++;
     	}
     }
-    fprintf(fp, "</date>", ctime(&t));
+    fprintf(fp, "</date>");
     fclose(fp);
 }
 
