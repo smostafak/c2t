@@ -24,7 +24,7 @@ void err_iso(int *fldErr, char *filename)
 	int i, j, nerr;
     FILE *fp;
     fp = fopen(filename, "a+");
-    nerr = sizeof(errdef)/sizeof(errmsg);
+    //nerr = sizeof(errdef)/sizeof(errmsg);
     if (!fp)
     {
     	printf("Can not open file %s", filename);
@@ -37,7 +37,7 @@ void err_iso(int *fldErr, char *filename)
     	if (fldErr[i] != 0)
     	{
     		j = 0;
-    		while (errdef(j) != NULL)
+    		while (!errdef(j))
     		{
     			if (fldErr[i] == errdef(j).Err_ID)
 
@@ -155,12 +155,12 @@ int check_fld(char *value, int idx, const isodef* def)
 void err_sys(int err_code, char *filename);
 {
 	time_t t;
-	char *desc
-    file *fp;
+	char *desc;
+    FILE *fp;
     fp = fopen(filename, "a+");
     if (!fp)
     {
-    	printf("Can not open file %s", filenamd);
+    	printf("Can not open file %s", filename);
     	exit(1);
     }
     t = time(0);
