@@ -1,6 +1,6 @@
 include ./Make.defines
 
-PROGS = iso8583-test utilities_test
+PROGS = utilities_test
 
 all:	lib	${PROGS}
 

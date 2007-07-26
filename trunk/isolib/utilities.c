@@ -40,7 +40,7 @@ char	int2hexachar(int num){
 		if(num <10) 
 			return (char) ('0' + num);
 		else
-			return (char) ('a' + num - 10);
+			return (char) ('A' + num - 10);
 	}
 }
 
@@ -159,7 +159,7 @@ char *lpad(char *s, int len, char ch)
  * 		\param  len is number 
  * 		\param  ch is character fill    
  */
-char *rpad(char *s, int len, char ch);		
+char *rpad(char *s, int len, char ch)
 {
     int i = strlen(s);
 

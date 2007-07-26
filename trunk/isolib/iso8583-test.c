@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "iso8583.h"
+#include "iso8583_std.h"
 
 char authreq[] = {
 0x31,0x31,0x30,0x30,0x70,0x14,0x05,0xC2,0x00,0xE2,0x80,0x00,0x31,0x31,0x31,0x32,
@@ -210,18 +211,18 @@ isodef pbsmg20[] = {
 	char *buf;
 	FILE *fp;
 
-	iso8583_init(&m);	
+	init_message(&m);	
 	m.bmp_flag = BMP_BINARY;
 
 	buf = (char *) calloc(4096, sizeof(char));
 	printf("\n--- Authorisation Request ---\n");
-	iso8583_unpack(&m, pbsmg20, authreq);
+	unpack_message(&m, pbsmg20, authreq);
 	for (i = 0; i <= 128; i++) {
 		if (m.fld[i] != NULL) {
 			printf("field #%d = %s\n", i, m.fld[i]);
 		}
 	}
-	len = iso8583_pack(&m, pbsmg20, buf);
+	len = pack_message(&m, pbsmg20, buf);
 	if (!memcmp(authreq, buf, len)) {
 		printf("Packed data equals original data\n");
 	} else {
@@ -230,18 +231,18 @@ isodef pbsmg20[] = {
 	fp = fopen("c1-auth-req.bin", "wb");
 	fwrite(buf, sizeof(char), len, fp);
 	fclose(fp);
-	iso8583_free(&m);
+	free_message(&m);
 	free(buf);
 
 	buf = (char *) calloc(4096, sizeof(char));
 	printf("\n--- Authorisation Response ---\n");
-	iso8583_unpack(&m, pbsmg20, authresp);
+	unpack_message(&m, pbsmg20, authresp);
 	for (i = 0; i <= 128; i++) {
 		if (m.fld[i] != NULL) {
 			printf("field #%d = %s\n", i, m.fld[i]);
 		}
 	}
-	len = iso8583_pack(&m, pbsmg20, buf);
+	len = pack_message(&m, pbsmg20, buf);
 	if (!memcmp(authresp, buf, len)) {
 		printf("Packed data equals original data\n");
 	} else {
@@ -250,18 +251,18 @@ isodef pbsmg20[] = {
 	fp = fopen("c2-auth-resp.bin", "wb");
 	fwrite(buf, sizeof(char), 4096, fp);
 	fclose(fp);
-	iso8583_free(&m);
+	free_message(&m);
 	free(buf);
 
 	buf = (char *) calloc(4096, sizeof(char));
 	printf("\n--- Capture Request ---\n");
-	iso8583_unpack(&m, pbsmg20, capreq);
+	unpack_message(&m, pbsmg20, capreq);
 	for (i = 0; i <= 128; i++) {
 		if (m.fld[i] != NULL) {
 			printf("field #%d = %s\n", i, m.fld[i]);
 		}
 	}
-	len = iso8583_pack(&m, pbsmg20, buf);
+	len = pack_message(&m, pbsmg20, buf);
 	if (!memcmp(capreq, buf, len)) {
 		printf("Packed data equals original data\n");
 	} else {
@@ -269,19 +270,19 @@ isodef pbsmg20[] = {
 	}
 	fp = fopen("c3-cap-req.bin", "wb");
 	fwrite(buf, sizeof(char), 4096, fp);
-	iso8583_free(&m);
+	free_message(&m);
 	fclose(fp);
 	free(buf);
 
 	buf = (char *) calloc(4096, sizeof(char));
 	printf("\n--- Capture Response ---\n");
-	iso8583_unpack(&m, pbsmg20, capresp);
+	unpack_message(&m, pbsmg20, capresp);
 	for (i = 0; i <= 128; i++) {
 		if (m.fld[i] != NULL) {
 			printf("field #%d = %s\n", i, m.fld[i]);
 		}
 	}
-	len = iso8583_pack(&m, pbsmg20, buf);
+	len = pack_message(&m, pbsmg20, buf);
 	if (!memcmp(capresp, buf, len)) {
 		printf("Packed data equals original data\n");
 	} else {
@@ -292,7 +293,7 @@ isodef pbsmg20[] = {
 	fclose(fp);
 	free(buf);
 
-	iso8583_free(&m);
+	free_message(&m);
 
 	return 0;
 }

@@ -1,34 +1,34 @@
 /*!	\file	iso8583.c
- * 		\brief	The main source file of this library 
+ * 		\brief	The main source file of this library
  */
- 
-#include <stdlib.h> 
+
+#include <stdlib.h>
 #include <string.h>
 #include "iso8583.h"
 #include "utilities.h"
 #include "errors.h"
 
-/*!	\fn	int setdata(isomsg *m, char *buff ); 
- * 		\brief	set data to a field 
+/*!	\func	int setdata(isomsg *m, char *buff );
+ * 		\brief	set data to a field
  * 		\param	m is a pointer to a isomsg
- * 		\param  buff is a pointer to byte string     
+ * 		\param  buff is a pointer to byte string
  */
 static int set_data(isomsg *m, int idx, char *buff )
 {
     if (idx >= 1 && idx <= 129) {
     	int len = strlen(buff);
     	m->fld[idx] = (char *)malloc((len + 1)*sizeof(char));
-    	if (m->fld[idx] == NULL) return ERR_OUTMEM;    	
+    	if (m->fld[idx] == NULL) return ERR_OUTMEM;
     	memcpy(m->fld[idx], buff, len);
     }
     return 0;
 }
 
-/*!	\fn	void init_message(isomsg *m);			 
+/*!	\func	void init_message(isomsg *m);
  * 		\brief	Initialize an ISO message struct - i.e. set all entries to NULL
- * 		\param	m is an ::isomsg   
+ * 		\param	m is an ::isomsg
  */
-void init_message(isomsg *m)	
+void init_message(isomsg *m)
 {
 	int i;
 	m->bmp_flag = 0; 				/*!	Default format is binary format */
@@ -38,14 +38,14 @@ void init_message(isomsg *m)
 }
 
 
-/*!	\fn 	int pack_message(const isomsg *m, const isodef *d, char *buf)
+/*!	\func 	int pack_message(const isomsg *m, const isodef *d, char *buf)
  *		\brief  Using the definition d, pack the content of the ISO message m into buf. \n
  * 				 NOTE: buf must be large enough to contain the packed message.
  *				   Returns the length of the data written to buf.
- * 
+ *
  * 		\param		m is an ::isomsg structure pointer that contains all message elements to be packed
  * 		\param 	d is an array of ::isodef structures which refers to all data element definitions of  an iso standard
- * 		\param		buf is the iso message buffer that contains the packed iso message. 
+ * 		\param		buf is the iso message buffer that contains the packed iso message.
  * 		\return		The length of the iso message buffer or zero if have errors.
  */
 int pack_message(const isomsg *m, const isodef *d, char *buf)
@@ -58,9 +58,10 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 	char tmp[20];
 	Bytes byte_tmp, hexa_tmp;
 	int flderr[129];
+
 	char *filename, *syslog;
 	filename = "./log.txt";
-	syslog = "./syslog.txt"
+	syslog = "./syslog.txt";
 
 	/* Field 0 is mandatory and fixed length. */
 	           for (i = 0; i < 129; i++)
@@ -78,7 +79,7 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 	buf += d[0].flds;
 
 	/*
-	 * The bitmap contains either 64 or 128 fields - flds is the 
+	 * The bitmap contains either 64 or 128 fields - flds is the
 	 * number of allowed fields, i.e. either 64 or 128.
 	 */
 	flds = 64;
@@ -97,12 +98,12 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 		return 0;
 	}
 	/*
-	 * First bit in the bitmap (field 1) defines if the message is 
+	 * First bit in the bitmap (field 1) defines if the message is
 	 * extended or not.
-	 * 0: not exteded - i.e. only (some of) the fields 0 to 64 are 
+	 * 0: not exteded - i.e. only (some of) the fields 0 to 64 are
 	 *    used
 	 * 1: extended - i.e. (some of) the fields 0 to 128 are used
-	 * I.e. if one or more of the fields 65 to 128 is used, the 
+	 * I.e. if one or more of the fields 65 to 128 is used, the
 	 * bit is 1.
 	 */
 	if (flds == 128) {
@@ -110,7 +111,7 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 	}
 
 	/*
-	 * The bits 2 to 64/128 defines if the corresponding field is 
+	 * The bits 2 to 64/128 defines if the corresponding field is
 	 * present (1) or not (0).
 	 */
 	for (i = 2; i <= flds; i++) {
@@ -119,7 +120,7 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 			bitmap[(i-1)/8] |= 0x80 >> ((i-1)%8);
 		}
 	}
-	
+
 	if(m->bmp_flag == BMP_BINARY){
 		memcpy(buf, bitmap, flds/8);
 		buf += flds/8;
@@ -129,7 +130,7 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 		memcpy(byte_tmp.bytes, bitmap, byte_tmp.length/8);
 		bytes2hexachars(&byte_tmp, &hexa_tmp);
 		memcpy(buf, hexa_tmp.bytes, hexa_tmp.length);
-		buf += hexa_tmp.length; 
+		buf += hexa_tmp.length;
 	}
 
 	for (i = 2; i <= flds; i++) {
@@ -143,7 +144,7 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 					sprintf(buf, tmp, len);
 					if (len > d[i].flds) {
 						/* FIXME: error */
-						/*The length of this field is too long*/					
+						/*The length of this field is too long*/
 						flderr[i] = 1;
 						err_iso(flderr, filename);
 						return 0;
@@ -176,7 +177,7 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 				len = d[i].flds;
 
 				/* FIXME: How can we check ISO_BINARY? */
-				if (d[i].format != ISO_BINARY && 
+				if (d[i].format != ISO_BINARY &&
 				    strlen(m->fld[i]) != len) {
 					/* FIXME: error */
 					/*The lengthe is not correct*/
@@ -201,7 +202,7 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 }
 
 
-/*!	\fn			int unpack_message(isomsg *m, const isodef *d, const char *buf)
+/*!	\func			int unpack_message(isomsg *m, const isodef *d, const char *buf)
  * 		\brief 		Using the definition d, unpack the content of buf into the ISO message struct m.
  * 		\param 	m is an ::isomsg structure pointer that contains all message elements which are unpacked
  * 		\param 	d is an array of ::isodef structures which refers to all data element definitions of  an iso standard
@@ -219,12 +220,13 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
     char *syslog;
     Bytes byte_tmp, hexa_tmp;
     int flderr[129];
+
 	for (i = 0; i < 129; i++)
 	{
 		flderr[i] = 0;
 	}
 	filename = "./log.txt";
-	syslog = "./syslog.txt"
+	syslog = "./syslog.txt";
 	/* Field 0 is mandatory and fixed length. */
 	if (d[0].lenflds != 0) {
 		/* FIXME: error */
@@ -245,12 +247,12 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 	buf += d[0].flds;
 
 	/*
-	 * First bit in the bitmap (field 1) defines if the message is 
+	 * First bit in the bitmap (field 1) defines if the message is
 	 * extended or not.
-	 * 0: not exteded - i.e. only (some of) the fields 0 to 64 are 
+	 * 0: not exteded - i.e. only (some of) the fields 0 to 64 are
 	 *    used
 	 * 1: extended - i.e. (some of) the fields 0 to 128 are used
-	 * I.e. if one or more of the fields 65 to 128 is used, the 
+	 * I.e. if one or more of the fields 65 to 128 is used, the
 	 * bit is 1.
 	 */
 	if(buf[0] & 0x80) {
@@ -258,7 +260,7 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 	} else {
 		flds = 64;
 	}
-	
+
 	if(m->bmp_flag == BMP_BINARY){
 		m->fld[1] = (char *) calloc(flds/8 + 1, sizeof(char));
 		if (!m->fld[1])
@@ -269,9 +271,9 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 			return 0;
 		}
 		memcpy(m->fld[1], buf, flds/8);
-		buf += flds/8;		
-	}else{					
-		hexa_tmp.length = flds/4;	
+		buf += flds/8;
+	}else{
+		hexa_tmp.length = flds/4;
 		hexa_tmp.bytes = (char *) calloc(hexa_tmp.length, sizeof(char));
 		memcpy(hexa_tmp.bytes, buf, flds/4);
 		hexachars2bytes(&hexa_tmp, &byte_tmp);
@@ -293,7 +295,7 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 				sprintf(tmp, "%%0%dd", d[i].lenflds);
 				sscanf(buf, tmp, &len);
 				/*
-				 * The length of a field can't be 
+				 * The length of a field can't be
 				 * larger than defined by d[i].flds.
 				 */
 				if (len > d[i].flds) {
@@ -347,17 +349,17 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 			err_iso(flderr, filename);
 			break;
 		}
-	return set_data(msg,idx,numchar);
+	//return set_data(m, idx, numchar);
 	return 0;
 }
 
 
-/*!	\fn 			void dump_message(FILE *fp, isomsg *m)
+/*!	\func 			void dump_message(FILE *fp, isomsg *m)
  * 		\brief 		Dump the content of the ISO message m into a file
  * 		\param 	fp is a FILE pointer that points to the message-storing file
- * 		\param		m is an ::isomsg structure pointer that contains all message elements which needs dumping 
- */	
- 	
+ * 		\param		m is an ::isomsg structure pointer that contains all message elements which needs dumping
+ */
+
 void dump_message(FILE *fp, isomsg *m)
 {
 	int i;
@@ -370,8 +372,8 @@ void dump_message(FILE *fp, isomsg *m)
 }
 
 
-/*!	\fn			void free_message(isomsg *m)
- *  	\brief		Free memory used by the ISO message struct m. 
+/*!	\func			void free_message(isomsg *m)
+ *  	\brief		Free memory used by the ISO message struct m.
  */
 void free_message(isomsg *m)
 {
@@ -384,47 +386,47 @@ void free_message(isomsg *m)
 		}
 	}
 }
-/*!	\fn			int set_field(isomsg* msg, const isodef *def, int idx, void* fld)
- *  	\brief		set data to a field of iso msg. 
+/*!	\func			int set_field(isomsg* msg, const isodef *def, int idx, void* fld)
+ *  	\brief		set data to a field of iso msg.
  */
 
 int set_field(isomsg* msg, const isodef *def, int idx, void* fld, int len)
-{	
+{
 	int format;
-	
+
 	if ((idx > 129) || (idx < 1))
 		/*
 		 * The value of idx must be between 1 and 129
 		 */
 		return ERR_IVLFLD; //Invalid field
-	
-	format= def[idx].format; 
-	
+
+	format= def[idx].format;
+
 	switch (format) {
 		case ISO_BITMAP:
 			break;
-		case ISO_NUMERIC:		
-			if (len != )
-			char numchar[100];	
-			/*Convert to number characters*/
-			sprintf(numchar,"%ld",(long)*fld);
-			int len = strlen(numchar);
-		    
-			if (len > def[idx].flds)
-			/*
-			 * The length of this field too long			 
-			 */
-				return ERR_OVRLEN; //error code
-			if (IS_FIXED_LEN(def,idx)) {
-				lpad(numchar, def[idx].flds, '0');
-			}
+		case ISO_NUMERIC:
+//			if (len != )
+//			char numchar[100];
+//			/*Convert to number characters*/
+//			sprintf(numchar,"%ld",(long)*fld);
+//			int len = strlen(numchar);
+//
+//			if (len > def[idx].flds)
+//			/*
+//			 * The length of this field too long
+//			 */
+//				return ERR_OVRLEN; //error code
+//			if (IS_FIXED_LEN(def,idx)) {
+//				lpad(numchar, def[idx].flds, '0');
+//			}
 			break;
 		case ISO_ALPHANUMERIC:
 			break;
 		case ISO_BINARY:
 			break;
 		default:
-			return -1;//invalid format		
-	}	
+			return -1;//invalid format
+	}
 }
 
