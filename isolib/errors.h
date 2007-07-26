@@ -12,7 +12,7 @@ typedef struct {
 	
 	/*! \brief This var represents the description of this error */
 	const char *dsc;	
-} errmsg;*/
+} errmsg;
 /*Define the const error of iso message*/
 const errmsg errdef[] ={
 		{1, "The length of field is too long"}, /*The length of field is too long*/
@@ -47,7 +47,7 @@ char *scan_err(int err_code);
  * 		\param def: the definition is used to parse msg
  * 		\output: the errors code if have or zero (not error)
 */
-int check_fld(char *value, int idx, cons isodef *def);
+int check_fld(char *value, int idx, const isodef *def);
 
 /*!	\fn	void *err_sys(int err_code, FILE *fp)		 
  * 		\brief	This function is used to process the system error (such as out of memory ...)

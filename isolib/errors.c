@@ -36,7 +36,7 @@ void err_iso(int *fldErr, char *filename)
     		j = 0;
     		while (errdef(j) != NULL)
     		{
-    			if (fleErr[i] == errdef(j).Err_ID)
+    			if (fldErr[i] == errdef(j).Err_ID)
     			{
     				fprintf(fp, "	<field id = %d>\n", i);
     				fprintf(fp, "		<err_code>%d>", i);
