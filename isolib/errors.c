@@ -46,11 +46,12 @@ void err_iso(int *fldErr, char *filename)
     				fprintf(fp, "		<err_code>%d>", fldErr[i]);
     				fprintf(fp, "		</err_code>\n");
     				fprintf(fp, "		<desc>%s>", errdef[i].dsc);
-    				fprintf(fp, "		</err_code>\n");
+    				fprintf(fp, "		</desc>\n");
     				fprintf(fp, "	</field>\n", i);
     				break;
     			}
     			j++;
+    		}
     	}
     }
     fprintf(fp, "</date>");
@@ -153,7 +154,7 @@ int check_fld(char *value, int idx, const isodef* def)
  * 		\param filename is the name of the log file for system error
  * 		\Output: the desc of this error is written to log file (file name)
  */
-void err_sys(int err_code, char *filename);
+void err_sys(int err_code, char *filename)
 {
 	time_t t;
 	char *desc;
