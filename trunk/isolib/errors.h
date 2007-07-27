@@ -3,7 +3,10 @@
 #include "iso8583.h"
 #define	ERR_OVRLEN	100
 #define	ERR_OUTMEM	101
-#define  ERR_IVLFLD		102
+#define  ERR_OVIDX	102 //The index is out of range
+#define ERR_IVLLEN 103
+#define ERR_IVLFMT 104  //invalid format(format is not defined)
+#define ERR_IVLVAL 105 //The value is not compatible with the format of this field
 
 /*!	\struct		errmsg
  * 		\brief		The ERROR ISO message structure
@@ -24,12 +27,12 @@ typedef struct {
 
 /*Define the const error of iso message*/
 static const errmsg errdef[] ={
-		{1, "The length of field is too long"}, /*The length of field is too long*/
-		{2, "The length of field is not correct"}, /*The length of field is not correct*/
-		{3, "The format of this field is not define"},  /*The format of this field is not define*/
-		{4, "The index of field is out of range"},	/*The index of field is out of range*/
-		{5,"The value of this field is not correct format"}, /*The value of this field is not correct format*/
-		{6, "Out of memory"} /*Out of memory*/
+		{ERR_OVRLEN, "The length of field is too long"}, /*The length of field is too long*/
+		{ERR_IVLLEN, "The length of field is not correct"}, /*The length of field is not correct*/
+		{ERR_IVLFMT, "The format of this field is not define"},  /*The format of this field is not define*/
+		{ERR_OVIDX, "The index of field is out of range"},	/*The index of field is out of range*/
+		{ERR_IVLVAL,"The value of this field is not correct format"}, /*The value of this field is not correct format*/
+		{ERR_OUTMEM, "Out of memory"} /*Out of memory*/
 }; /*The format error*/
 
 /*!	\func	void err_iso(int *fldErr, FILE *fp)
