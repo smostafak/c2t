@@ -7,6 +7,11 @@
 #define ERR_IVLLEN 103
 #define ERR_IVLFMT 104  //invalid format(format is not defined)
 #define ERR_IVLVAL 105 //The value is not compatible with the format of this field
+#define ERR_IVLFLD	106 // Invalid field
+
+/*! \brief	error for utility functions from 2000 to 3000 */
+#define  ERR_HEXBYT	2000
+#define	ERR_BYTHEX	2001
 
 /*!	\struct		errmsg
  * 		\brief		The ERROR ISO message structure
@@ -32,7 +37,11 @@ static const errmsg errdef[] ={
 		{ERR_IVLFMT, "The format of this field is not define"},  /*The format of this field is not define*/
 		{ERR_OVIDX, "The index of field is out of range"},	/*The index of field is out of range*/
 		{ERR_IVLVAL,"The value of this field is not correct format"}, /*The value of this field is not correct format*/
-		{ERR_OUTMEM, "Out of memory"} /*Out of memory*/
+		{ERR_OUTMEM, "Out of memory"}, /*Out of memory*/
+		{ERR_IVLFLD, "Invalid field"},
+		{ERR_HEXBYT, "Failed to convert hexa characters to a byte array"},
+		{ERR_BYTHEX, "Failed to convert a byte array to hexa characters"}
+
 }; /*The format error*/
 
 /*!	\func	void err_iso(int *fldErr, FILE *fp)

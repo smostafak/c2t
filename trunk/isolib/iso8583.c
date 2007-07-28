@@ -127,8 +127,17 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 	}else{
 		byte_tmp.length = flds;
 		byte_tmp.bytes = (char*) calloc(byte_tmp.length, sizeof(char));
+		if(!byte_tmp.bytes){
+			sys_err_code = ERR_OUTMEM;
+			err_sys(sys_err_code, syslog);
+			return 0;
+		}
 		memcpy(byte_tmp.bytes, bitmap, byte_tmp.length/8);
-		bytes2hexachars(&byte_tmp, &hexa_tmp);
+		if( bytes2hexachars(&byte_tmp, &hexa_tmp) < 0){
+			flderr[1] = ERR_BYTHEX;
+			err_iso(flderr, filename);
+			return 0;
+		};
 		memcpy(buf, hexa_tmp.bytes, hexa_tmp.length);
 		buf += hexa_tmp.length;
 	}
@@ -276,7 +285,12 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 		hexa_tmp.length = flds/4;
 		hexa_tmp.bytes = (char *) calloc(hexa_tmp.length, sizeof(char));
 		memcpy(hexa_tmp.bytes, buf, flds/4);
-		hexachars2bytes(&hexa_tmp, &byte_tmp);
+		if( hexachars2bytes(&hexa_tmp, &byte_tmp) < 0){
+			flderr[1] = ERR_HEXBYT;
+			err_iso(flderr, filename);
+			return 0;
+		}
+
 		m->fld[1] = (char*) calloc(byte_tmp.length/8 + 1, sizeof(char));
 		if (!m->fld[1])
 		{
