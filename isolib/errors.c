@@ -146,7 +146,6 @@ int check_fld(char *value, int idx, const isodef* def)
 		err_code = 3;
 	}
 	return err_code;
-
 }
 /*!	\fn	void *err_sys(int err_code, FILE *fp)
  * 		\brief	This function is used to process the system error (such as out of memory ...)
