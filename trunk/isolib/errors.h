@@ -44,12 +44,12 @@ static const errmsg errdef[] ={
 
 }; /*The format error*/
 
-/*!	\func	void err_iso(int *fldErr, FILE *fp)
+/*!	\func	void iso_err(int *fldErr, FILE *fp)
  * 		\brief this function is call to write the errors in msg to the log file
  * 		\param	fldErr is an array that contains all errors in msg 8583
  * 		\filename is name of log file
 */
-void err_iso(int *fldErr, char *filename);
+void iso_err(int *fldErr, char *filename);
 //char *scan_err(int err_code, int fld_idx)
 /*!	\func	char *scan_err(int *fldErr, FILE *fp)
  * 		\brief	This function is used to show the description of errors
@@ -67,11 +67,11 @@ char *scan_err(int err_code);
 */
 int check_fld(char *value, int idx, const isodef *def);
 
-/*!	\fn	void *err_sys(int err_code, FILE *fp)
+/*!	\fn	void *sys_err(int err_code, FILE *fp)
  * 		\brief	This function is used to process the system error (such as out of memory ...)
  * 		\param	err_code is the code of this error
  * 		\param filename is the name of the log file for system error
  * 		\Output: the desc of this error is written to log file (file name)
  */
-void err_sys(int err_code, char *filename);
+void sys_err(int err_code, char *filename);
 #endif /*ERRORS_H_*/
