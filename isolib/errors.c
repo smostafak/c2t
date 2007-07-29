@@ -11,17 +11,18 @@
 #include "errors.h"
 #include "iso8583.h"
 
-/*!	\fn	void err_iso(int *fldErr, char *filename)
+/*!	\fn	void iso_err(int *fldErr, char *filename)
  *  	\brief	Show the message error to the logfile.
  * 		\param fldErr: the array contains all errors in message
  * 		\param filename: the name of log file
  * 		\return the log file write error in message
  */
 
-void err_iso(int *fldErr, char *filename)
+void iso_err(int *fldErr, char *filename)
 {
 	time_t t;
 	int i, j, nerr;
+	char* tmp;
     FILE *fp;
     fp = fopen(filename, "a+");
     //nerr = sizeof(errdef)/sizeof(errmsg);
@@ -31,7 +32,9 @@ void err_iso(int *fldErr, char *filename)
     	exit(1);
     }
     t = time(0);
-    fprintf(fp, "<date %s>\n", ctime(&t));
+    tmp = ctime(&t);
+    tmp[strlen(tmp)-1] = '\0';
+    fprintf(fp, "<parse_time %s>\n", tmp);
     for(i = 0; i < 129; i++)
     {
     	if (fldErr[i] != 0)
@@ -54,7 +57,7 @@ void err_iso(int *fldErr, char *filename)
     		}
     	}
     }
-    fprintf(fp, "</date>");
+    fprintf(fp, "</parse_time>\n");
     fclose(fp);
 }
 
@@ -147,13 +150,13 @@ int check_fld(char *value, int idx, const isodef* def)
 	}
 	return err_code;
 }
-/*!	\fn	void *err_sys(int err_code, FILE *fp)
+/*!	\fn	void *sys_err(int err_code, FILE *fp)
  * 		\brief	This function is used to process the system error (such as out of memory ...)
  * 		\param	err_code is the code of this error
  * 		\param filename is the name of the log file for system error
  * 		\Output: the desc of this error is written to log file (file name)
  */
-void err_sys(int err_code, char *filename)
+void sys_err(int err_code, char *filename)
 {
 	time_t t;
 	char *desc;

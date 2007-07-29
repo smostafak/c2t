@@ -72,7 +72,7 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 		/* FIXME: error */
 		/*This error is the length of field is not correct*/
 		flderr[0] = 2;
-		err_iso(flderr, filename);
+		iso_err(flderr, filename);
 		return 0;
 	}
 	memcpy(buf, m->fld[0], d[0].flds);
@@ -94,7 +94,7 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 	if (!bitmap)
 	{
 		sys_err_code = 6;
-		err_sys(sys_err_code, syslog);
+		sys_err(sys_err_code, syslog);
 		return 0;
 	}
 	/*
@@ -129,13 +129,13 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 		byte_tmp.bytes = (char*) calloc(byte_tmp.length, sizeof(char));
 		if(!byte_tmp.bytes){
 			sys_err_code = ERR_OUTMEM;
-			err_sys(sys_err_code, syslog);
+			sys_err(sys_err_code, syslog);
 			return 0;
 		}
 		memcpy(byte_tmp.bytes, bitmap, byte_tmp.length/8);
 		if( bytes2hexachars(&byte_tmp, &hexa_tmp) < 0){
 			flderr[1] = ERR_BYTHEX;
-			err_iso(flderr, filename);
+			iso_err(flderr, filename);
 			return 0;
 		};
 		memcpy(buf, hexa_tmp.bytes, hexa_tmp.length);
@@ -155,7 +155,7 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 						/* FIXME: error */
 						/*The length of this field is too long*/
 						flderr[i] = 1;
-						err_iso(flderr, filename);
+						iso_err(flderr, filename);
 						return 0;
 					}
 					buf += d[i].lenflds;
@@ -167,7 +167,7 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 						/* FIXME: error */
 						/*The length of field is not correct*/
 						flderr[i] = 1;
-						err_iso(flderr, filename);
+						iso_err(flderr, filename);
 						return 0;
 					}
 					/* Copy length bytes from m->fld[i] */
@@ -178,7 +178,7 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 					/*The format error of this field*/
 					/*Format out of range*/
 					flderr[i] = 3;
-					err_iso(flderr, filename);
+					iso_err(flderr, filename);
 					return 0;
 					break;
 				}
@@ -191,7 +191,7 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 					/* FIXME: error */
 					/*The lengthe is not correct*/
 					flderr[i] = 2;
-					err_iso(flderr, filename);
+					iso_err(flderr, filename);
 					return 0;
 				}
 			}
@@ -206,7 +206,7 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
                 }
 	}
 	/*write all error in this message to file*/
-	err_iso(flderr, filename);
+	iso_err(flderr, filename);
 	return (buf - start);
 }
 
@@ -240,15 +240,15 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 	if (d[0].lenflds != 0) {
 		/* FIXME: error */
 		flderr[0] = 2;
-		err_iso(flderr, filename);
+		iso_err(flderr, filename);
 		return 0;
 	}
 	m->fld[0] = (char *) malloc((d[0].flds + 1) * sizeof(char));
 	if(!m->fld[0])
 	{
 		sys_err_code = 6;
-		//void err_sys(int err_code, char *filename);
-		err_sys(sys_err_code, syslog);
+		//void sys_err(int err_code, char *filename);
+		sys_err(sys_err_code, syslog);
 		return 0;
 	}
 	memcpy(m->fld[0], buf, d[0].flds);
@@ -275,8 +275,8 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 		if (!m->fld[1])
 		{
 			sys_err_code = 6;
-			//void err_sys(int err_code, char *filename);
-			err_sys(sys_err_code, syslog);
+			//void sys_err(int err_code, char *filename);
+			sys_err(sys_err_code, syslog);
 			return 0;
 		}
 		memcpy(m->fld[1], buf, flds/8);
@@ -287,7 +287,7 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 		memcpy(hexa_tmp.bytes, buf, flds/4);
 		if( hexachars2bytes(&hexa_tmp, &byte_tmp) < 0){
 			flderr[1] = ERR_HEXBYT;
-			err_iso(flderr, filename);
+			iso_err(flderr, filename);
 			return 0;
 		}
 
@@ -295,8 +295,8 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 		if (!m->fld[1])
 		{
 			sys_err_code = 6;
-			//void err_sys(int err_code, char *filename);
-			err_sys(sys_err_code, syslog);
+			//void sys_err(int err_code, char *filename);
+			sys_err(sys_err_code, syslog);
 			return 0;
 		}
 		memcpy(m->fld[1], byte_tmp.bytes, byte_tmp.length/8);
@@ -316,7 +316,7 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 					/* FIXME: warning/error */
 					/*The length of this field is too long*/
 					flderr[i] = 1;
-					err_iso(flderr, filename);
+					iso_err(flderr, filename);
 					return 0;
 				}
 			} else { /* Fixed length */
@@ -337,7 +337,7 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 				/* FIXME: error */
 				/*The format of this field is not correct*/
 				flderr[i] = 3;
-				err_iso(flderr, filename);
+				iso_err(flderr, filename);
 				return 0;
 				break;
 			}
@@ -345,8 +345,8 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 			if (!m->fld[i])
 			{
 				sys_err_code = 6;
-				//void err_sys(int err_code, char *filename);
-				err_sys(sys_err_code, syslog);
+				//void sys_err(int err_code, char *filename);
+				sys_err(sys_err_code, syslog);
 				return 0;
 			}
 			memcpy(m->fld[i], buf, len);
@@ -360,7 +360,7 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 	for (i = 0; i < 129; i++)
 		if (flderr[i] !=0)
 		{
-			err_iso(flderr, filename);
+			iso_err(flderr, filename);
 			break;
 		}
 	//return set_data(m, idx, numchar);
