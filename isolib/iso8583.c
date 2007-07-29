@@ -71,7 +71,7 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 	if (strlen(m->fld[0]) != d[0].flds || d[0].lenflds != 0) {
 		/* FIXME: error */
 		/*This error is the length of field is not correct*/
-		flderr[0] = 2;
+		flderr[0] = ERR_IVLLEN;
 		iso_err(flderr, filename);
 		return 0;
 	}
@@ -154,7 +154,7 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 					if (len > d[i].flds) {
 						/* FIXME: error */
 						/*The length of this field is too long*/
-						flderr[i] = 1;
+						flderr[i] = ERR_OVRLEN;
 						iso_err(flderr, filename);
 						return 0;
 					}
@@ -165,8 +165,8 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 					sscanf(m->fld[i], tmp, &len);
 					if (len > d[i].flds) {
 						/* FIXME: error */
-						/*The length of field is not correct*/
-						flderr[i] = 1;
+						/*The length of field is too long*/
+						flderr[i] = ERR_OVRLEN;
 						iso_err(flderr, filename);
 						return 0;
 					}
@@ -177,7 +177,7 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 					/* FIXME: error */
 					/*The format error of this field*/
 					/*Format out of range*/
-					flderr[i] = 3;
+					flderr[i] = ERR_IVLFMT;
 					iso_err(flderr, filename);
 					return 0;
 					break;
@@ -190,7 +190,7 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 				    strlen(m->fld[i]) != len) {
 					/* FIXME: error */
 					/*The lengthe is not correct*/
-					flderr[i] = 2;
+					flderr[i] = ERR_IVLLEN;
 					iso_err(flderr, filename);
 					return 0;
 				}
@@ -239,14 +239,15 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 	/* Field 0 is mandatory and fixed length. */
 	if (d[0].lenflds != 0) {
 		/* FIXME: error */
-		flderr[0] = 2;
+		/*The length define is not correct*/
+		flderr[0] = ERR_IVLLEN;
 		iso_err(flderr, filename);
 		return 0;
 	}
 	m->fld[0] = (char *) malloc((d[0].flds + 1) * sizeof(char));
 	if(!m->fld[0])
 	{
-		sys_err_code = 6;
+		sys_err_code = ERR_OUTMEM;
 		//void sys_err(int err_code, char *filename);
 		sys_err(sys_err_code, syslog);
 		return 0;
@@ -274,7 +275,7 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 		m->fld[1] = (char *) calloc(flds/8 + 1, sizeof(char));
 		if (!m->fld[1])
 		{
-			sys_err_code = 6;
+			sys_err_code = ERR_OUTMEM;
 			//void sys_err(int err_code, char *filename);
 			sys_err(sys_err_code, syslog);
 			return 0;
@@ -294,7 +295,7 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 		m->fld[1] = (char*) calloc(byte_tmp.length/8 + 1, sizeof(char));
 		if (!m->fld[1])
 		{
-			sys_err_code = 6;
+			sys_err_code = ERR_OUTMEM;
 			//void sys_err(int err_code, char *filename);
 			sys_err(sys_err_code, syslog);
 			return 0;
@@ -315,7 +316,7 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 				if (len > d[i].flds) {
 					/* FIXME: warning/error */
 					/*The length of this field is too long*/
-					flderr[i] = 1;
+					flderr[i] = ERR_OVRLEN;
 					iso_err(flderr, filename);
 					return 0;
 				}
@@ -335,8 +336,8 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 				break;
 			default:
 				/* FIXME: error */
-				/*The format of this field is not correct*/
-				flderr[i] = 3;
+				/*The format of this field is not defined*/
+				flderr[i] = ERR_IVLFMT;
 				iso_err(flderr, filename);
 				return 0;
 				break;
@@ -344,7 +345,7 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 			m->fld[i] = (char *) malloc((len + 1) * sizeof(char));
 			if (!m->fld[i])
 			{
-				sys_err_code = 6;
+				sys_err_code = ERR_OUTMEM;
 				//void sys_err(int err_code, char *filename);
 				sys_err(sys_err_code, syslog);
 				return 0;
@@ -412,7 +413,7 @@ int set_field(isomsg* msg, const isodef *def, int idx, void* fld, int len)
 		/*
 		 * The value of idx must be between 1 and 129
 		 */
-		return ERR_IVLFLD; //Invalid field
+		return ERR_OVIDX; //Invalid index
 
 	format= def[idx].format;
 
