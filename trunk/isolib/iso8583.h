@@ -21,7 +21,7 @@
 
 
 /*!	\struct		isodef
- * 		\brief		The structure holds all data delement definitions of an iso8583 version.  		
+ * 		\brief		The structure holds all data delement definitions of an iso8583 version.
  */
 typedef struct {
 	/*!  \brief  The data element format:
@@ -29,39 +29,39 @@ typedef struct {
 	 * 			- 1 for Numeric
 	 * 			- 2 for alphanumeric
 	 * 			- 3 for binary
-	 */ 
+	 */
 	int format;
-	
-	/*! \brief  This var represents the length of the len portion of this data element (LL or LLL) */	
-	int lenflds; 				
-	
+
+	/*! \brief  This var represents the length of the len portion of this data element (LL or LLL) */
+	int lenflds;
+
 	/*! \brief This var represents the len of the data element */
-	int flds;					
-	
+	int flds;
+
 	/*! \brief This var represents the description of this data element */
-	const char *dsc;	
+	const char *dsc;
 } isodef;
 
 /*!	\struct		isomsg
- * 		\brief		The ISO message structure 		
- */		
+ * 		\brief		The ISO message structure
+ */
 typedef struct {
 	/*! \brief The flag to identify whether the bitmap is in binary or hexa format */
 	int bmp_flag;
 	/*! \brief The 129 field pointer array		*/
-	char *fld[129];	
+	char *fld[129];
 } isomsg;
 
-void init_message(isomsg *m);	
+void init_message(isomsg *m);
 int pack_message(const isomsg *m, const isodef *d, char *buf);
 int unpack_message(isomsg *m, const isodef *d, const char *buf);
 void dump_message(FILE *fp, isomsg *m);
 void free_message(isomsg *m);
 
 /*!	\func	set data to a field of iso msg	*/
-int set_field(isomsg* msg, const isodef *def, int idx, void* fld, int len);
+int set_field(isomsg* m, const isodef *def, int idx, const char* fld);
 /*!	\func	get data from a field of iso msg	*/
-int get_field(const char* buf, const isodef *def, int idx, void* fld, int *len);
+int get_field(char* buf, const isodef *def, int idx, char* fld, int bmp_flag);
 
 
 #endif /* iso8583.h */
