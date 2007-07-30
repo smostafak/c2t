@@ -130,16 +130,21 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 		if(!byte_tmp.bytes){
 			sys_err_code = ERR_OUTMEM;
 			sys_err(sys_err_code, syslog);
+			free(bitmap);
 			return 0;
 		}
 		memcpy(byte_tmp.bytes, bitmap, byte_tmp.length/8);
 		if( bytes2hexachars(&byte_tmp, &hexa_tmp) < 0){
 			flderr[1] = ERR_BYTHEX;
 			iso_err(flderr, filename);
+			free(bitmap);
+			free(byte_tmp.bytes);
 			return 0;
 		};
 		memcpy(buf, hexa_tmp.bytes, hexa_tmp.length);
 		buf += hexa_tmp.length;
+		free(byte_tmp.bytes);
+		free(hexa_tmp.bytes);
 	}
 
 	for (i = 2; i <= flds; i++) {
@@ -248,8 +253,8 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 	if(!m->fld[0])
 	{
 		sys_err_code = ERR_OUTMEM;
-		//void sys_err(int err_code, char *filename);
 		sys_err(sys_err_code, syslog);
+		free(m->fld[0]);
 		return 0;
 	}
 	memcpy(m->fld[0], buf, d[0].flds);
@@ -289,6 +294,8 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 		if( hexachars2bytes(&hexa_tmp, &byte_tmp) < 0){
 			flderr[1] = ERR_HEXBYT;
 			iso_err(flderr, filename);
+			free(hexa_tmp.bytes);
+			free(m->fld[0]);
 			return 0;
 		}
 
@@ -296,12 +303,16 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 		if (!m->fld[1])
 		{
 			sys_err_code = ERR_OUTMEM;
-			//void sys_err(int err_code, char *filename);
 			sys_err(sys_err_code, syslog);
+			free(m->fld[0]);
+			free(hexa_tmp.bytes);
+			free(byte_tmp.bytes);
 			return 0;
 		}
 		memcpy(m->fld[1], byte_tmp.bytes, byte_tmp.length/8);
 		buf += flds/4;
+		free(hexa_tmp.bytes);
+		free(byte_tmp.bytes);
 	}
 
 	for (i = 2; i <= flds; i++) {
@@ -318,6 +329,7 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 					/*The length of this field is too long*/
 					flderr[i] = ERR_OVRLEN;
 					iso_err(flderr, filename);
+					free(buf);
 					return 0;
 				}
 			} else { /* Fixed length */
@@ -401,47 +413,193 @@ void free_message(isomsg *m)
 		}
 	}
 }
-/*!	\func			int set_field(isomsg* msg, const isodef *def, int idx, void* fld)
+/*!	\func			int set_field(isomsg* m, const isodef *def, int idx, const char* fld)
+ *  	\brief		set data to a field of iso msg.
+ */
+/*!	\func			int set_field(isomsg* m, const isodef *def, int idx, const char* fld)
  *  	\brief		set data to a field of iso msg.
  */
 
-int set_field(isomsg* msg, const isodef *def, int idx, void* fld, int len)
+int set_field(isomsg* m, const isodef *def, int idx, const char* fld)
 {
-	int format;
 
-	if ((idx > 129) || (idx < 1))
+	if ((idx > 128) || (idx < 0)) {
 		/*
-		 * The value of idx must be between 1 and 129
+		 * The value of idx must be between 0 and 128
 		 */
-		return ERR_OVIDX; //Invalid index
+		return ERR_IVLFLD; /*Invalid field*/
+	}
 
-	format= def[idx].format;
+	int format = def[idx].format;
+	int len = strlen(fld);
+
+	if (len > def[idx].flds) {
+		/*
+		 * The length of this field too long
+		 */
+		return ERR_OVRLEN;
+	}
 
 	switch (format) {
 		case ISO_BITMAP:
+			m->fld[idx] = (char *)malloc((len + 1)*sizeof(char));
+			if (m->fld[idx] == NULL)
+				return ERR_OUTMEM;
+
+			memcpy(m->fld[idx], fld, len);
+			m->fld[idx][len] = '\0';
 			break;
 		case ISO_NUMERIC:
-//			if (len != )
-//			char numchar[100];
-//			/*Convert to number characters*/
-//			sprintf(numchar,"%ld",(long)*fld);
-//			int len = strlen(numchar);
-//
-//			if (len > def[idx].flds)
-//			/*
-//			 * The length of this field too long
-//			 */
-//				return ERR_OVRLEN; //error code
-//			if (IS_FIXED_LEN(def,idx)) {
-//				lpad(numchar, def[idx].flds, '0');
-//			}
+			m->fld[idx] = (char *)malloc((len + 1)*sizeof(char));
+			if (m->fld[idx] == NULL)
+				return ERR_OUTMEM;
+
+			memcpy(m->fld[idx], fld, len);
+			m->fld[idx][len] = '\0';
+			if (IS_FIXED_LEN(def,idx)) {
+				lpad(m->fld[idx], def[idx].flds, '0');
+			}
 			break;
 		case ISO_ALPHANUMERIC:
+			m->fld[idx] = (char *)malloc((len + 1)*sizeof(char));
+			if (m->fld[idx] == NULL)
+				return ERR_OUTMEM;
+
+			memcpy(m->fld[idx], fld, len);
+			m->fld[idx][len] = '\0';
+			if (IS_FIXED_LEN(def,idx)) {
+				rpad(m->fld[idx], def[idx].flds, ' ');
+			}
 			break;
 		case ISO_BINARY:
+			m->fld[idx] = (char *)malloc((len + 1)*sizeof(char));
+			if (m->fld[idx] == NULL)
+				return ERR_OUTMEM;
+
+			memcpy(m->fld[idx], fld, len);
+			m->fld[idx][len] = '\0';
 			break;
 		default:
-			return -1;//invalid format
+			return ERR_IVLFMT; /*invalid format*/
 	}
+	return 0;
 }
 
+/*!	\func			int get_field(const char* buf, const isodef *def, int idx, char* fld, int bmp_flag);
+ *  	\brief		get data of a field from the msg buff.
+ */
+
+int get_field(char *buf, const isodef *def, int idx, char *fld, int bmp_flag)
+{
+	char *pos = &buf[0];
+
+	if ((idx > 128) || (idx < 0)) {
+		/*
+		 * The value of idx must be between 0 and 128
+		 */
+		return ERR_IVLFLD; /*Invalid field*/
+	}
+
+	/* Field 0 is mandatory and fixed length. */
+	if (def[0].lenflds) {
+		/* FIXME: error */
+		return -1;
+	}
+
+	if (idx == 0) {
+		/* the field is mti */
+		memcpy(fld,pos,def[0].flds);
+		fld[def[0].flds] = 0;
+		return 0;
+	}
+
+	pos += def[0].flds;
+	/* get the bitmap to determine a field exist in the msg */
+	/*
+	 * First bit in the bitmap (field 1) defines if the message is
+	 * extended or not.
+	 * 0: not exteded - i.e. only (some of) the fields 0 to 64 are
+	 *    used
+	 * 1: extended - i.e. (some of) the fields 0 to 128 are used
+	 * I.e. if one or more of the fields 65 to 128 is used, the
+	 * bit is 1.
+	 */
+	int flds = 64;
+	if(*pos & 0x80) {
+		flds = 128;
+	} else {
+		flds = 64;
+	}
+	char bitmap[100];
+
+	if(bmp_flag == BMP_BINARY){
+		memcpy(bitmap, pos, flds/8);
+		bitmap[flds/8] = 0;
+		pos += flds/8;
+	}else{
+		Bytes byte_tmp, hexa_tmp;
+		hexa_tmp.length = flds/4;
+		hexa_tmp.bytes = (char *) calloc(hexa_tmp.length, sizeof(char));
+		memcpy(hexa_tmp.bytes, pos, flds/4);
+		hexachars2bytes(&hexa_tmp, &byte_tmp);
+		memcpy(bitmap, byte_tmp.bytes, byte_tmp.length/8);
+		bitmap[byte_tmp.length/8] = 0;
+		pos += flds/4;
+	}
+
+	if (idx == 1) {
+		/* the field is bitmap */
+		int len = strlen(bitmap);
+		memcpy(fld,bitmap,len);
+		fld[len] = 0;
+		return 0;
+	}
+
+	if (idx <= flds && ((bitmap[(idx-1)/8] << ((idx-1)%8)) & 0x80)) { /* idx'th bit != 0 */
+		int i;
+		int len;
+		char tmp[20];
+		for (i = 2; i <= idx; i++) {
+			if ((bitmap[(i-1)/8] << ((i-1)%8)) & 0x80) { /* i'th bit != 0 */
+				if (!IS_FIXED_LEN(def,i)) { /* Variable length */
+					sprintf(tmp, "%%0%dd", def[i].lenflds);
+					sscanf(pos, tmp, &len);
+					/*
+					 * The length of a field can't be
+					 * larger than defined by def[i].flds.
+					 */
+					if (len > def[i].flds) {
+						return ERR_OVRLEN;
+					}
+				}
+				else { /* Fixed length */
+					len = def[i].flds;
+				}
+				switch (def[i].format) {
+					case ISO_NUMERIC: /* Fallthrough */
+					case ISO_ALPHANUMERIC:
+						/* Don't copy lenght bytes */
+						pos += def[i].lenflds;
+						break;
+					case ISO_BINARY:
+						/* Copy length bytes */
+						len += def[i].lenflds;
+						break;
+					default:
+						return ERR_IVLFMT; /*invalid format*/
+				}
+
+				if (i == idx) {
+					memcpy(fld, pos, len);
+					fld[len] = '\0';
+				}
+				pos += len;
+			}
+		}
+	}
+	else {
+		/* the field not exist */
+		return -1;
+	}
+	return 0;
+}
