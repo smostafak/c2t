@@ -167,3 +167,17 @@ char *rpad(char *s, int len, char ch)
     memset(s+i, ch, (size_t)(len - i));
     return s;
 }
+
+/*!	\fn	int is_numeric(char *s)		 
+ * 		\brief return 1 if string s is numeric string, return 0 if otherwise
+ * 		\param	s is a pointer to a string     
+ */
+int is_numeric(char *s)  
+{
+	while (*s) {
+		if (*s < '0' || *s > '9') 
+			return 0;		
+	}
+	return 1;
+}
+
