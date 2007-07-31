@@ -173,3 +173,32 @@ void sys_err(int err_code, char *filename)
     fprintf(fp, "%s\n", desc);
     fclose(fp);
 }
+/*! \fn void err_hld(int err_code, int err_type, char *desc)
+ * 		\brief This function is used to write the error of one field to the log file
+ * 		\param err_code the error code that recieved when error appear
+ * 		\param err_type is type of error, if err_type = 1 is the system error else is the iso error
+ * 		\param desc is the description of this error
+ * 		\output: the desc of this error is written to log file (file name)
+ */
+void err_hld(int err_code, int err_type, char *desc)
+{
+	
+	char *filename;
+	FILE *fp;
+	time_t t;
+	filename="log.txt";
+	t = time(0);
+	fp = fopen(filename, "a+");
+	if (!fp)
+	{
+		printf("Can not open file %s", filename);
+	   	exit(1);
+	}
+    fprintf(fp, "%s -",  ctime(&t));
+    if (err_type == ISO)
+    	fprintf(fp, "%d - ISO - %s\n", desc);
+    else
+    	fprintf(fp, "%d - SYS - %s\n", desc);
+    fclose(fp);
+
+}
