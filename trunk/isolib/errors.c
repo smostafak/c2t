@@ -184,11 +184,14 @@ void sys_err(int err_code, char *filename)
 int handle_err(int err_code, int err_type, char *moredesc)
 {
 	char *filename;
+	char *str; //Stirng of time
 	FILE *fp;
 	time_t t;
+	struct tm *ptr;
 	char *desc;
 	filename="log.txt";
 	t = time(0);
+	ptr = localtime(&t);
 	fp = fopen(filename, "a+");
 	if (!fp)
 	{
@@ -200,7 +203,9 @@ int handle_err(int err_code, int err_type, char *moredesc)
 	{
 		return -1;
 	}
-    fprintf(fp, "%s -",  ctime(&t));
+    //fprintf(fp, "%s -",  ctime(&t));
+    strftime(str, 100, "%d-%m-%Y:%H:%M:%S", ptr);
+    fprintf(fp, "%s -", str);
     if (err_type == ISO)
     	fprintf(fp, "%d - ISO - %s - %s\n", err_code, desc, moredesc);
     else
