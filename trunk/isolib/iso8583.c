@@ -28,10 +28,10 @@ static int set_data(isomsg *m, int idx, char *buff )
  * 		\brief	Initialize an ISO message struct - i.e. set all entries to NULL
  * 		\param	m is an ::isomsg
  */
-void init_message(isomsg *m)
+void init_message(isomsg *m, int bmp_flag)
 {
 	int i;
-	m->bmp_flag = 0; 				/*!	Default format is binary format */
+	m->bmp_flag = bmp_flag; 				/*!	Default format is binary format */
 	for (i = 0; i <= 128; i++) {
 		m->fld[i] = NULL;
 	}
@@ -59,20 +59,10 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 	Bytes byte_tmp, hexa_tmp;
 	int flderr[129];
 
-	char *filename, *syslog;
-	filename = "./log.txt";
-	syslog = "./syslog.txt";
-
-	/* Field 0 is mandatory and fixed length. */
-	           for (i = 0; i < 129; i++)
-	           {
-	        	   flderr[i] = 0;
-	           }
 	if (strlen(m->fld[0]) != d[0].flds || d[0].lenflds != 0) {
 		/* FIXME: error */
 		/*This error is the length of field is not correct*/
-		flderr[0] = ERR_IVLLEN;
-		iso_err(flderr, filename);
+		handle_err(ERR_IVLLEN, ISO, "Field 0 --> Length is over its length in iso8583 definition");
 		return 0;
 	}
 	memcpy(buf, m->fld[0], d[0].flds);
@@ -93,8 +83,9 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 	bitmap = (char *) calloc(flds/8 + 1, sizeof(char));
 	if (!bitmap)
 	{
-		sys_err_code = 6;
-		sys_err(sys_err_code, syslog);
+		char err_msg[100];
+		sprintf("%s:%d --> Can't allocate memory for the bitmap buffer", __FILE__, __LINE__);
+		handle_err(ERR_OUTMEM, SYS, err_msg);
 		return 0;
 	}
 	/*
@@ -128,15 +119,17 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 		byte_tmp.length = flds;
 		byte_tmp.bytes = (char*) calloc(byte_tmp.length, sizeof(char));
 		if(!byte_tmp.bytes){
-			sys_err_code = ERR_OUTMEM;
-			sys_err(sys_err_code, syslog);
+			char err_msg[100];
+			sprintf("%s:%d --> Can't allocate memory", __FILE__, __LINE__);
+			handle_err(ERR_OUTMEM, SYS, err_msg);
 			free(bitmap);
 			return 0;
 		}
 		memcpy(byte_tmp.bytes, bitmap, byte_tmp.length/8);
 		if( bytes2hexachars(&byte_tmp, &hexa_tmp) < 0){
-			flderr[1] = ERR_BYTHEX;
-			iso_err(flderr, filename);
+			char err_msg[100];
+			sprintf("%s:%d --> Can't convert bytes to a hexacharacter array", __FILE__, __LINE__);
+			handle_err(ERR_BYTHEX, SYS, err_msg);
 			free(bitmap);
 			free(byte_tmp.bytes);
 			return 0;
@@ -157,10 +150,10 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 					sprintf(tmp, "%%0%dd", d[i].lenflds);
 					sprintf(buf, tmp, len);
 					if (len > d[i].flds) {
-						/* FIXME: error */
 						/*The length of this field is too long*/
-						flderr[i] = ERR_OVRLEN;
-						iso_err(flderr, filename);
+						char err_msg[100];
+						sprintf(err_msg, "Field %d --> The length of this field is too long", i);
+						handle_err(ERR_OVRLEN, ISO, err_msg);
 						return 0;
 					}
 					buf += d[i].lenflds;
@@ -169,23 +162,23 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 					sprintf(tmp, "%%0%dd", d[i].lenflds);
 					sscanf(m->fld[i], tmp, &len);
 					if (len > d[i].flds) {
-						/* FIXME: error */
-						/*The length of field is too long*/
-						flderr[i] = ERR_OVRLEN;
-						iso_err(flderr, filename);
+						char err_msg[100];
+						sprintf(err_msg, "Field %d --> The length of this field is too long", i);
+						handle_err(ERR_OVRLEN, ISO, err_msg);
 						return 0;
 					}
 					/* Copy length bytes from m->fld[i] */
 					len += d[i].lenflds;
 					break;
-				default:
-					/* FIXME: error */
-					/*The format error of this field*/
-					/*Format out of range*/
-					flderr[i] = ERR_IVLFMT;
-					iso_err(flderr, filename);
-					return 0;
-					break;
+				default:{
+						/* FIXME: error */
+						/*The format error of this field*/
+						/*Format out of range*/
+						char err_msg[100];
+						sprintf(err_msg, "Field %d --> Format out of range", i);
+						return 0;
+						break;
+					}
 				}
 			} else { /* Fixed length */
 				len = d[i].flds;
@@ -195,8 +188,8 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 				    strlen(m->fld[i]) != len) {
 					/* FIXME: error */
 					/*The lengthe is not correct*/
-					flderr[i] = ERR_IVLLEN;
-					iso_err(flderr, filename);
+					char err_msg[100];
+					sprintf(err_msg, "Field %d --> The length is not correct", i);
 					return 0;
 				}
 			}
@@ -210,8 +203,6 @@ int pack_message(const isomsg *m, const isodef *d, char *buf)
 			buf += len;
                 }
 	}
-	/*write all error in this message to file*/
-	iso_err(flderr, filename);
 	return (buf - start);
 }
 
@@ -230,31 +221,22 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 	int i, sys_err_code;
 	int len;
     char tmp[20];
-    char *filename;
-    char *syslog;
     Bytes byte_tmp, hexa_tmp;
     int flderr[129];
 
-	for (i = 0; i < 129; i++)
-	{
-		flderr[i] = 0;
-	}
-	filename = "./log.txt";
-	syslog = "./syslog.txt";
 	/* Field 0 is mandatory and fixed length. */
 	if (d[0].lenflds != 0) {
 		/* FIXME: error */
 		/*The length define is not correct*/
-		flderr[0] = ERR_IVLLEN;
-		iso_err(flderr, filename);
+		handle_err(ERR_IVLLEN, ISO, "Definition 0 --> The length define is not correct");
 		return 0;
 	}
 	m->fld[0] = (char *) malloc((d[0].flds + 1) * sizeof(char));
 	if(!m->fld[0])
 	{
-		sys_err_code = ERR_OUTMEM;
-		sys_err(sys_err_code, syslog);
-		free(m->fld[0]);
+		char err_msg[100];
+		sprintf(err_msg, "%s:%d --> Can't allocate memory for field 0", __FILE__, __LINE__);
+		handle_err(ERR_OUTMEM, SYS, err_msg);
 		return 0;
 	}
 	memcpy(m->fld[0], buf, d[0].flds);
@@ -270,30 +252,33 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 	 * I.e. if one or more of the fields 65 to 128 is used, the
 	 * bit is 1.
 	 */
-	if(buf[0] & 0x80) {
-		flds = 128;
-	} else {
-		flds = 64;
-	}
-
 	if(m->bmp_flag == BMP_BINARY){
+		if(buf[0] & 0x80) {
+			flds = 128;
+		} else {
+			flds = 64;
+		}
 		m->fld[1] = (char *) calloc(flds/8 + 1, sizeof(char));
 		if (!m->fld[1])
 		{
-			sys_err_code = ERR_OUTMEM;
-			//void sys_err(int err_code, char *filename);
-			sys_err(sys_err_code, syslog);
+			char err_msg[100];
+			sprintf(err_msg, "%s:%d --> Can't allocate memory for field 1", __FILE__, __LINE__);
+			handle_err(ERR_OUTMEM, SYS, err_msg);
 			return 0;
 		}
 		memcpy(m->fld[1], buf, flds/8);
 		buf += flds/8;
 	}else{
+		if(hexachar2int(buf[0]) & 0x08){
+			flds = 128;
+		} else {
+			flds = 64;
+		}
 		hexa_tmp.length = flds/4;
 		hexa_tmp.bytes = (char *) calloc(hexa_tmp.length, sizeof(char));
 		memcpy(hexa_tmp.bytes, buf, flds/4);
 		if( hexachars2bytes(&hexa_tmp, &byte_tmp) < 0){
-			flderr[1] = ERR_HEXBYT;
-			iso_err(flderr, filename);
+			handle_err(ERR_HEXBYT, SYS, "Can't convert the bitmap hexachar array to binary");
 			free(hexa_tmp.bytes);
 			free(m->fld[0]);
 			return 0;
@@ -302,8 +287,9 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 		m->fld[1] = (char*) calloc(byte_tmp.length/8 + 1, sizeof(char));
 		if (!m->fld[1])
 		{
-			sys_err_code = ERR_OUTMEM;
-			sys_err(sys_err_code, syslog);
+			char err_msg[100];
+			sprintf(err_msg, "%s:%d --> Can't allocate memory for field 1", __FILE__, __LINE__);
+			handle_err(ERR_OUTMEM, SYS, err_msg);
 			free(m->fld[0]);
 			free(hexa_tmp.bytes);
 			free(byte_tmp.bytes);
@@ -327,9 +313,9 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 				if (len > d[i].flds) {
 					/* FIXME: warning/error */
 					/*The length of this field is too long*/
-					flderr[i] = ERR_OVRLEN;
-					iso_err(flderr, filename);
-					free(buf);
+					char err_msg[100];
+					sprintf(err_msg, "Field %d --> The length of this field is too long", i);
+					handle_err(ERR_OVRLEN, ISO, err_msg);
 					return 0;
 				}
 			} else { /* Fixed length */
@@ -346,20 +332,22 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 				/* Copy length bytes */
 				len += d[i].lenflds;
 				break;
-			default:
-				/* FIXME: error */
-				/*The format of this field is not defined*/
-				flderr[i] = ERR_IVLFMT;
-				iso_err(flderr, filename);
-				return 0;
-				break;
+			default:{
+					/* FIXME: error */
+					/*The format of this field is not defined*/
+					char err_msg[100];
+					sprintf(err_msg, "Field %d --> The format of this field is not defined", i);
+					handle_err(ERR_IVLFMT, ISO, err_msg);
+					return 0;
+					break;
+				}
 			}
 			m->fld[i] = (char *) malloc((len + 1) * sizeof(char));
 			if (!m->fld[i])
 			{
-				sys_err_code = ERR_OUTMEM;
-				//void sys_err(int err_code, char *filename);
-				sys_err(sys_err_code, syslog);
+				char err_msg[100];
+				sprintf(err_msg, "%s:%d --> Can't allocate memory for field %d", __FILE__, __LINE__, i);
+				handle_err(ERR_OUTMEM, SYS, err_msg);
 				return 0;
 			}
 			memcpy(m->fld[i], buf, len);
@@ -370,13 +358,6 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 			buf += len;
 		}
 	}
-	for (i = 0; i < 129; i++)
-		if (flderr[i] !=0)
-		{
-			iso_err(flderr, filename);
-			break;
-		}
-	//return set_data(m, idx, numchar);
 	return 0;
 }
 
@@ -525,18 +506,23 @@ int get_field(char *buf, const isodef *def, int idx, char *fld, int bmp_flag)
 	 * bit is 1.
 	 */
 	int flds = 64;
-	if(*pos & 0x80) {
-		flds = 128;
-	} else {
-		flds = 64;
-	}
 	char bitmap[100];
 
 	if(bmp_flag == BMP_BINARY){
+		if(*pos & 0x80) {
+			flds = 128;
+		} else {
+			flds = 64;
+		}
 		memcpy(bitmap, pos, flds/8);
 		bitmap[flds/8] = 0;
 		pos += flds/8;
 	}else{
+		if(hexachar2int(*pos) & 0x08) {
+			flds = 128;
+		} else {
+			flds = 64;
+		}
 		Bytes byte_tmp, hexa_tmp;
 		hexa_tmp.length = flds/4;
 		hexa_tmp.bytes = (char *) calloc(hexa_tmp.length, sizeof(char));
