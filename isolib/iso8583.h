@@ -52,7 +52,7 @@ typedef struct {
 	char *fld[129];
 } isomsg;
 
-void init_message(isomsg *m);
+void init_message(isomsg *m, int bmp_flag);
 int pack_message(const isomsg *m, const isodef *d, char *buf);
 int unpack_message(isomsg *m, const isodef *d, const char *buf);
 void dump_message(FILE *fp, isomsg *m);
