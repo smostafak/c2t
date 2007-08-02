@@ -69,7 +69,7 @@ char *scan_err(int err_code);
 */
 int check_fld(char *value, int idx, const isodef *def);
 
-/*!	\fn	void *sys_err(int err_code, FILE *fp)
+/*!	\func	void *sys_err(int err_code, FILE *fp)
  * 		\brief	This function is used to process the system error (such as out of memory ...)
  * 		\param	err_code is the code of this error
  * 		\param filename is the name of the log file for system error
@@ -77,7 +77,7 @@ int check_fld(char *value, int idx, const isodef *def);
  */
 void sys_err(int err_code, char *filename);
 
-/*! \fn void handle_err(int err_code, int err_type, char *desc)
+/*! \func void handle_err(int err_code, int err_type, char *desc)
  * 		\brief This function is used to write the error of one field to the log file
  * 		\param err_code the error code that recieved when error appear
  * 		\param err_type is type of error, if err_type = 1 is the system error else is the iso error

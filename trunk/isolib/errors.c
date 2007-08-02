@@ -11,7 +11,7 @@
 #include "errors.h"
 #include "iso8583.h"
 
-/*!	\fn	void iso_err(int *fldErr, char *filename)
+/*!	\func	void iso_err(int *fldErr, char *filename)
  *  	\brief	Show the message error to the logfile.
  * 		\param fldErr: the array contains all errors in message
  * 		\param filename: the name of log file
@@ -61,7 +61,7 @@ void iso_err(int *fldErr, char *filename)
     fclose(fp);
 }
 
-/*!	\fn	char *scan_err(int *fldErr, FILE *fp)
+/*!	\func	char *scan_err(int *fldErr, FILE *fp)
 * 		\brief	this procedure is call when having error during field setting
 * 		\param	err_code is the return value of the function iso8583_set_fmtbitmap
 * 		\Output: description about the error
@@ -92,7 +92,7 @@ char* scan_err(int err_code)
 	}
 }
 
-/*!	\fn	check_fld(char *value, int idx, cons isodef *def)
+/*!	\func	check_fld(char *value, int idx, cons isodef *def)
  * 		\brief	this procedure is call to check weather a field is correct or not (pack and unpack)
  * 		\param	value: the value of this field (is set or get from msg)
  * 		\param idx: the possition of this field in msg
@@ -150,7 +150,7 @@ int check_fld(char *value, int idx, const isodef* def)
 	}
 	return err_code;
 }
-/*!	\fn	void *sys_err(int err_code, FILE *fp)
+/*!	\func	void *sys_err(int err_code, FILE *fp)
  * 		\brief	This function is used to process the system error (such as out of memory ...)
  * 		\param	err_code is the code of this error
  * 		\param filename is the name of the log file for system error
@@ -173,7 +173,7 @@ void sys_err(int err_code, char *filename)
     fprintf(fp, "%s\n", desc);
     fclose(fp);
 }
-/*! \fn void handle_err(int err_code, int err_type, char *desc)
+/*! \func void handle_err(int err_code, int err_type, char *desc)
  * 		\brief This function is used to write the error of one field to the log file
  * 		\param err_code the error code that recieved when error appear
  * 		\param err_type is type of error, if err_type = 1 is the system error else is the iso error
