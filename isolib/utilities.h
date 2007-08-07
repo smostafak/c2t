@@ -53,10 +53,4 @@ char *lpad(char *s, int len, char ch);
  */
 char *rpad(char *s, int len, char ch);	
 
-/*!	\fn	int is_numeric(char *s)		 
- * 		\brief return 1 if string s is numeric string, return 0 if otherwise
- * 		\param	s is a pointer to a string     
- */
-int is_numeric(char *s);
-
 #endif /*UTILITIES_H_*/
