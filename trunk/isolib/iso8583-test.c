@@ -211,7 +211,7 @@ isodef pbsmg20[] = {
 	char *buf;
 	FILE *fp;
 
-	init_message(&m);	
+	init_message(&m, BMP_BINARY);	
 	m.bmp_flag = BMP_BINARY;
 
 	buf = (char *) calloc(4096, sizeof(char));
