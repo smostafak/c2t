@@ -609,8 +609,8 @@ int get_field(char *buf, const isodef *def, int idx, char *fld, int bmp_flag)
 	}
 	else {
 		/* the field not exist */
-		sprintf(err_msg, "The fied %d is not exist", idx);
-		handle_err(ERR_IVLFLD, ISO, err_msg);
+		/*sprintf(err_msg, "The fied %d is not exist", idx);
+		handle_err(ERR_IVLFLD, ISO, err_msg);*/
 		return ERR_IVLFLD; /*invalid format*/
 	}
 	return 0;
