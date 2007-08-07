@@ -99,56 +99,34 @@ char* scan_err(int err_code)
  * 		\param def: the definition is used to parse msg
  * 		\output: the errors code if have or zero (not error)
 */
-int check_fld(char *value, int idx, const isodef* def)
+int check_fld(const char *value, int idx, const isodef *def)
 {
-	int i, err_code;
-	int lengthfld; //The length of the value
-
-
-	lengthfld = strlen(value);
-	if (def[idx].format == ISO_BITMAP)
-	{
-		err_code = 0;
-	}
-	else if (def[idx].format == ISO_NUMERIC)
-	{
-		for (i = 0; i < lengthfld; i++)
-		{
-			if (isdigit(value[i]) == 0)
-			{
-				err_code = 5;
-				break;
+	int i;
+	int len = strlen(value); //The length of the value
+	int format = def[idx].format;
+	
+	switch (format) {
+		case ISO_BITMAP:
+			break; //no checking here
+		case ISO_NUMERIC:
+			for(i = 0; i < len; i++) {
+				if(!isdigit(value[i]))
+					/* not a digit */
+					return ERR_IVLVAL;
 			}
-		}
+			break;
+		case ISO_ALPHANUMERIC:
+			for(i = 0; i < len; i++) {
+				if(iscntrl(value[i]))
+					/* invalid char */
+					return ERR_IVLVAL;
+				}
+			break;
+		case ISO_BINARY:
+			break;
 	}
-	else if (def[idx].format == ISO_ALPHANUMERIC)
-	{
-		for (i = 0; i < lengthfld; i++)
-		{
-			if (isalnum(value[i]) == 0)
-			{
-				err_code = 5;
-				break;
-			}
-		}
-	}
-	else if (def[idx].format == ISO_BINARY)
-	{
-		for (i = 0; i < lengthfld; i++)
-		{
-			if ((value[i] != '0') && (value[i] != '1'))
-			{
-				err_code = 5;
-				break;
-			}
-		}
-	}
-	else
-	{
-		//format of this field is not defined
-		err_code = 3;
-	}
-	return err_code;
+	
+	return 0; //no error found
 }
 /*!	\func	void *sys_err(int err_code, FILE *fp)
  * 		\brief	This function is used to process the system error (such as out of memory ...)

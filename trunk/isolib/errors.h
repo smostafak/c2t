@@ -4,10 +4,11 @@
 #define	ERR_OVRLEN	100
 #define	ERR_OUTMEM	101
 #define  ERR_OVIDX	102 //The index is out of range
-#define ERR_IVLLEN 103
-#define ERR_IVLFMT 104  //invalid format(format is not defined)
-#define ERR_IVLVAL 105 //The value is not compatible with the format of this field
-#define ERR_IVLFLD	106 // Invalid field
+#define  ERR_IVLLEN 103
+#define  ERR_IVLFMT 104  //invalid format(format is not defined)
+#define  ERR_IVLVAL 105 //The value is not compatible with the format of this field
+#define  ERR_IVLFLD	106 // Invalid field
+
 
 /*! \brief	error for utility functions from 2000 to 3000 */
 #define  ERR_HEXBYT	2000
@@ -42,7 +43,7 @@ static const errmsg errdef[] ={
 		{ERR_OUTMEM, "Out of memory"}, /*Out of memory*/
 		{ERR_IVLFLD, "Invalid field"},
 		{ERR_HEXBYT, "Failed to convert hexa characters to a byte array"},
-		{ERR_BYTHEX, "Failed to convert a byte array to hexa characters"}
+		{ERR_BYTHEX, "Failed to convert a byte array to hexa characters"}		
 
 }; /*The format error*/
 
@@ -67,7 +68,7 @@ char *scan_err(int err_code);
  * 		\param def: the definition is used to parse msg
  * 		\output: the errors code if have or zero (not error)
 */
-int check_fld(char *value, int idx, const isodef *def);
+int check_fld(const char *value, int idx, const isodef *def);
 
 /*!	\func	void *sys_err(int err_code, FILE *fp)
  * 		\brief	This function is used to process the system error (such as out of memory ...)
