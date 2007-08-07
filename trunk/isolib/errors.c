@@ -73,7 +73,7 @@ char* scan_err(int err_code)
 	char *desc;
 	i = 0;
 	nerr = sizeof(errdef)/sizeof(errmsg);
-	for(; i< nerr; i++)
+	for(; i < nerr; i++)
 	{
 		if (errdef[i].Err_ID == err_code)
 		{
@@ -167,7 +167,7 @@ int handle_err(int err_code, int err_type, char *moredesc)
 	time_t t;
 	struct tm *ptr;
 	char *desc;
-	filename="log.txt";
+	filename = "log.txt";
 	t = time(0);
 	ptr = localtime(&t);
 	fp = fopen(filename, "a+");
@@ -177,6 +177,11 @@ int handle_err(int err_code, int err_type, char *moredesc)
 		return -1;
 	}
 	desc = scan_err(err_code);
+	if (!desc)
+	{
+		printf("Error when scan this error");
+		return -1;
+	}
 	if (strcmp(desc, "Can not recognize this error code") == 0)
 	{
 		return -1;
