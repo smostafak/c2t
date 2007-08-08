@@ -162,7 +162,7 @@ void sys_err(int err_code, char *filename)
 int handle_err(int err_code, int err_type, char *moredesc)
 {
 	char *filename;
-	char *str; //Stirng of time
+	char str[100]; //Stirng of time
 	FILE *fp;
 	time_t t;
 	struct tm *ptr;
