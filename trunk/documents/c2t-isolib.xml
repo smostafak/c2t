@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<FDDProject>
+<Project>
+<Name>C2T-isolib</Name>
+<Progress>83</Progress>
+<Owner></Owner>
+<TargetMonth>Aug 13, 2007</TargetMonth>
+<MajorFeatureSet>
+<Name>Iso8583 Message Manipulation</Name>
+<Progress>50</Progress>
+<Owner></Owner>
+<TargetMonth>Aug 13, 2007</TargetMonth>
+<FeatureSet>
+<Name>Manipulating an Iso8583 Message</Name>
+<Progress>50</Progress>
+<Owner>nhchung</Owner>
+<TargetMonth>Aug 13, 2007</TargetMonth>
+<Feature>
+<Name>pack/unpack all fields of a message</Name>
+<Progress>100</Progress>
+<Owner></Owner>
+<TargetMonth>Aug 2, 2007</TargetMonth>
+</Feature>
+<Feature>
+<Name>export/import a xml format of  a message</Name>
+<Progress>1</Progress>
+<Owner>nhchung</Owner>
+<TargetMonth>Aug 13, 2007</TargetMonth>
+</Feature>
+</FeatureSet>
+</MajorFeatureSet>
+<MajorFeatureSet>
+<Name>Error Handling</Name>
+<Progress>100</Progress>
+<Owner>tcthang</Owner>
+<TargetMonth>Aug 5, 2007</TargetMonth>
+<FeatureSet>
+<Name>Logging an error</Name>
+<Progress>100</Progress>
+<Owner></Owner>
+<TargetMonth>Aug 2, 2007</TargetMonth>
+<Feature>
+<Name>log the description of an error</Name>
+<Progress>100</Progress>
+<Owner>tcthang</Owner>
+<TargetMonth>Aug 2, 2007</TargetMonth>
+</Feature>
+</FeatureSet>
+<FeatureSet>
+<Name>Checking a field-related error</Name>
+<Progress>100</Progress>
+<Owner>tcthang</Owner>
+<TargetMonth>Aug 5, 2007</TargetMonth>
+<Feature>
+<Name>check the format of a field</Name>
+<Progress>100</Progress>
+<Owner>tcthang</Owner>
+<TargetMonth>Aug 5, 2007</TargetMonth>
+</Feature>
+</FeatureSet>
+</MajorFeatureSet>
+<MajorFeatureSet>
+<Name>Iso8583 Field Management</Name>
+<Progress>100</Progress>
+<Owner>nttoan</Owner>
+<TargetMonth>Aug 2, 2007</TargetMonth>
+<FeatureSet>
+<Name>Manipulating a field</Name>
+<Progress>100</Progress>
+<Owner>nttoan</Owner>
+<TargetMonth>Aug 2, 2007</TargetMonth>
+<Feature>
+<Name>set data for a field</Name>
+<Progress>100</Progress>
+<Owner>nttoan</Owner>
+<TargetMonth>Aug 2, 2007</TargetMonth>
+</Feature>
+<Feature>
+<Name>get data of a field</Name>
+<Progress>100</Progress>
+<Owner>nttoan</Owner>
+<TargetMonth>Aug 2, 2007</TargetMonth>
+</Feature>
+</FeatureSet>
+</MajorFeatureSet>
+</Project>
+</FDDProject>
