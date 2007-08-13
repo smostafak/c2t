@@ -374,36 +374,43 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 void dump_message(FILE *fp, isomsg *m, int fmt_flag)
 {
 	int i;
-	char* xml_str; // xml string buffer
+	char* xml_str, *tail; // xml string buffer
 	xml_str = (char*) calloc(XML_MAX_LENGTH, sizeof(char));
-
+	tail = xml_str;
 	switch(fmt_flag){
 		case FMT_PLAIN:
-			sprintf(xml_str, "Field list: ");
+			sprintf(tail, "Field list: ");
+			tail = xml_str + strlen(xml_str);
+			/* print bitmap */
 			for (i =0; i <= 128; i++){
 				if(i==1) continue;
 				if (m->fld[i] != NULL) {
-						sprintf(xml_str, "%d \t ", i);
+						sprintf(tail, "%d \t ", i);
+						tail = xml_str + strlen(xml_str);
 				}
 			}
-			sprintf(xml_str,"\n");
+			sprintf(tail,"\n");
+			tail = xml_str + strlen(xml_str);
+
 			for (i = 0; i <= 128; i++) {
 				if(i==1) continue;
 				if (m->fld[i] != NULL) {
-						sprintf(xml_str, "field #%d = %s\n", i, m->fld[i]);
+						sprintf(tail, "field #%d = %s\n", i, m->fld[i]);
+						tail = xml_str + strlen(xml_str);
 				}
 			}
 			break;
 		case FMT_XML:
-			sprintf(xml_str, "<?xml	version=\"1.0\"	 ?>");
-			sprintf(xml_str, "<%s>", XML_ROOT_TAG);
+			sprintf(tail, "<?xml	version=\"1.0\"	 ?>\n<%s>\n", XML_ROOT_TAG);
+			tail = xml_str + strlen(xml_str);
 			for(i = 0; i <= 128; i++){
 				if (i == 1) continue;
 				if (m->fld[i] != NULL){
-					sprintf(xml_str, "<%s	id=\"%d\"		value=\"%s\"/>", XML_CHILD_TAG, i, m->fld[i]);
+					sprintf(tail, "\t<%s\tid=\"%d\"\tvalue=\"%s\"/>", XML_CHILD_TAG, i, m->fld[i]);
+					tail = xml_str + strlen(xml_str);
 				}
 			}
-			sprintf(xml_str, "</%s>\n", XML_ROOT_TAG);
+			sprintf(tail, "</%s>\n", XML_ROOT_TAG);
 			break;
 		default:{
 			char err_msg[100];

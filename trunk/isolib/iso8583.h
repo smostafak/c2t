@@ -13,6 +13,7 @@
 #define ISO_BINARY       3
 
 #define ISO_MAX_LENGTH		4096
+#define FIELD_MAX_LENGTH	2048
 
 #define IS_FIXED_LEN(def,idx) (def[(idx)].lenflds==0)
 
