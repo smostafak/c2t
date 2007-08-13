@@ -69,6 +69,8 @@ char* iso_to_xml(char* iso_msg, const isodef* def, int bmp_flag){
 
  	XML_SetUserData(parser, &iso_msg);
 
+ 	memset(iso_buf, '\0', sizeof(iso_buf));
+
 	if (! parser) {
 		char	err_msg[100];
 		sprintf(err_msg, "At file: %s		line:%s", __FILE__, __LINE__);
@@ -89,7 +91,7 @@ char* iso_to_xml(char* iso_msg, const isodef* def, int bmp_flag){
 	      return NULL;
 	    }
 	    current_pos += len;
-	    if(!current_pos) break;
+	    if(*current_pos=='\0') break;
 	}
 	err = pack_message(&iso_msg, def, iso_buf, &iso_len);
 
@@ -119,7 +121,7 @@ handle_start(void *data, const char *el, const char **attr)
 		while(attr[i]){
 			if((strcmp(attr[i], XML_FIELD_INDEX) == 0) && (i%2 == 0) ){	/* found the index attribute */
 				if(!attr[i+1]) continue;		/* don't have a value for 'index' attribute, continue */
-				if(fld_index) continue;		/* There are two 'index' attribute, ormit the second one*/
+				if(fld_index >= 0) continue;		/* There are two 'index' attribute, ormit the second one*/
 				fld_index = strtol(attr[i+1],(char**)NULL, 10);
 				if(errno){
 					fld_index = -1;
