@@ -1,6 +1,8 @@
 #ifndef ERRORS_H_
 #define ERRORS_H_
 #include "iso8583.h"
+
+#define	WARN				0
 #define	ERR_OVRLEN	100
 #define	ERR_OUTMEM	101
 #define  ERR_OVIDX	102 //The index is out of range
@@ -8,11 +10,23 @@
 #define  ERR_IVLFMT 104  //invalid format(format is not defined)
 #define  ERR_IVLVAL 105 //The value is not compatible with the format of this field
 #define  ERR_IVLFLD	106 // Invalid field
+#define 	ERR_IVLVER	107	// Invalid version
+#define	ERR_OUTRAG 108 //Out of range
 
 
-/*! \brief	error for utility functions from 2000 to 3000 */
+
+/*! \brief	errors for utility functions from 2000 to 3000 */
 #define  ERR_HEXBYT	2000
 #define	ERR_BYTHEX	2001
+#define	ERR_WROFMT	2002
+
+#define	ERR_NODFMT	4000	// not support this dump format
+
+/*!	\brief	errors for convert functions from 5000 to 6000 */
+#define ERR_PASMEM	5000
+#define ERR_XMLPAS		5001
+#define ERR_IVLIDX		5002
+
 
 #define ISO 1
 #define SYS 2
@@ -35,6 +49,7 @@ typedef struct {
 
 /*Define the const error of iso message*/
 static const errmsg errdef[] ={
+		{WARN, "Warning"},
 		{ERR_OVRLEN, "The length of field is too long"}, /*The length of field is too long*/
 		{ERR_IVLLEN, "The length of field is not correct"}, /*The length of field is not correct*/
 		{ERR_IVLFMT, "The format of this field is not define"},  /*The format of this field is not define*/
@@ -43,8 +58,14 @@ static const errmsg errdef[] ={
 		{ERR_OUTMEM, "Out of memory"}, /*Out of memory*/
 		{ERR_IVLFLD, "Invalid field"},
 		{ERR_HEXBYT, "Failed to convert hexa characters to a byte array"},
-		{ERR_BYTHEX, "Failed to convert a byte array to hexa characters"}		
-
+		{ERR_BYTHEX, "Failed to convert a byte array to hexa characters"},
+		{ERR_NODFMT, "Not support this dump format"},
+		{ERR_IVLVER, "Invalid version"},
+		{ERR_OUTRAG, "Out of range"},
+		{ERR_WROFMT, "Wrong format"},
+		{ERR_PASMEM, "Couldn't allocate memory for parser"},
+		{ERR_XMLPAS, "The XML document is not well-formed"},
+		{ERR_IVLIDX,"Invalid index value"},
 }; /*The format error*/
 
 /*!	\func	void iso_err(int *fldErr, FILE *fp)

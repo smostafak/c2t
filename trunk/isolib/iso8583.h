@@ -12,12 +12,26 @@
 #define ISO_ALPHANUMERIC 2
 #define ISO_BINARY       3
 
+#define ISO_MAX_LENGTH		4096
 
 #define IS_FIXED_LEN(def,idx) (def[(idx)].lenflds==0)
 
 
 #define BMP_BINARY		0
 #define BMP_HEXA			1
+
+#define FMT_PLAIN		0
+#define FMT_XML		1
+
+#define ISO_VER87	0
+#define ISO_VER93	1
+
+#define XML_MAX_LENGTH	8192
+
+#define XML_ROOT_TAG		"isomsg"
+#define XML_CHILD_TAG		"field"
+#define XML_FIELD_INDEX		"id"
+#define XML_FIELD_VALUE	"value"
 
 
 /*!	\struct		isodef
@@ -53,15 +67,23 @@ typedef struct {
 } isomsg;
 
 void init_message(isomsg *m, int bmp_flag);
-int pack_message(const isomsg *m, const isodef *d, char *buf);
+int pack_message(const isomsg *m, const isodef *d, char *buf, int* buf_len);
 int unpack_message(isomsg *m, const isodef *d, const char *buf);
-void dump_message(FILE *fp, isomsg *m);
+void dump_message(FILE *fp, isomsg *m, int fmt_flag);
 void free_message(isomsg *m);
+
+/*!	\brief	convert an iso message to xml format		*/
+char* iso_to_xml(char* iso_msg, const isodef *d, int bmp_flag);
+
+/*!	\brief	convert an xml string to iso message		*/
+char* xml_to_iso(char* xml_str, const isodef *def);
 
 /*!	\func	set data to a field of iso msg	*/
 int set_field(isomsg* m, const isodef *def, int idx, const char* fld);
 /*!	\func	get data from a field of iso msg	*/
 int get_field(char* buf, const isodef *def, int idx, char* fld, int bmp_flag);
+
+
 
 
 #endif /* iso8583.h */

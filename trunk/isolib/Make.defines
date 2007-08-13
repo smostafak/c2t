@@ -4,16 +4,17 @@
 # C programs.
 
 # Common definitions
-CC=cc
-CFLAGS	= -g
-LIB_NAME = libiso8583.a 
-LDFLAGS = ${LIB_NAME} -lresolv -lsocket -lnsl -lpthread
-LIBS = ${LDFLAGS}
+CC=cc	-g
+CFLAGS	= -I./include
+LIB_NAME = libiso8583.a
+LIB_EXPAT = ./lib/libexpat.a
+LDFLAGS =  -lresolv -lsocket -lnsl -lpthread
+LIBS = ${LIB_EXPAT} ${LIB_NAME} ${LDFLAGS}
 RANLIB = ranlib
 AR = ar rv
 
 # Our library that almost every program needs.
-LIB_OBJS = iso8583.o utilities.o errors.o
+LIB_OBJS = iso8583.o utilities.o errors.o convert.o
 
 # Common temp files to delete from each directory.
-CLEANFILES = core core.* *.core *.o temp.* *.out typescript* 
+CLEANFILES = core core.* *.core *.o temp.* *.out typescript*
