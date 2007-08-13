@@ -31,16 +31,19 @@ char* iso_to_xml(char* iso_msg, const isodef* def, int bmp_flag){
 		handle_err(WARN, ISO, "Can not unpack the iso message");
 		return NULL;
 	}else{
+		char *tail;
 		xml_str = (char*) calloc(XML_MAX_LENGTH, sizeof(char));
-		sprintf(xml_str, "<?xml	version=\"1.0\"	 ?>");
-		sprintf(xml_str, "<%s>", XML_ROOT_TAG);
+		tail = xml_str;
+		sprintf(tail, "<?xml\tversion=\"1.0\"?>\n<%s>\n", XML_ROOT_TAG);
+		tail = xml_str + strlen(xml_str);
 		for(i = 0; i <= 128; i++){
 			if (i == 1) continue;
 			if (unpacked_msg.fld[i] != NULL){
-				sprintf(xml_str, "<%s	id=\"%d\"		value=\"%s\"/>", XML_CHILD_TAG, i, unpacked_msg.fld[i]);
+				sprintf(tail, "\t<%s\tid=\"%d\"\tvalue=\"%s\"/>\n", XML_CHILD_TAG, i, unpacked_msg.fld[i]);
+				tail = xml_str + strlen(xml_str);
 			}
 		}
-		sprintf(xml_str, "</%s>\n", XML_ROOT_TAG);
+		sprintf(tail, "</%s>\n", XML_ROOT_TAG);
 		return xml_str;
 	}
 }
