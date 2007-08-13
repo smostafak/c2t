@@ -406,7 +406,7 @@ void dump_message(FILE *fp, isomsg *m, int fmt_flag)
 			for(i = 0; i <= 128; i++){
 				if (i == 1) continue;
 				if (m->fld[i] != NULL){
-					sprintf(tail, "\t<%s\tid=\"%d\"\tvalue=\"%s\"/>", XML_CHILD_TAG, i, m->fld[i]);
+					sprintf(tail, "\t<%s\tid=\"%d\"\tvalue=\"%s\"/>\n", XML_CHILD_TAG, i, m->fld[i]);
 					tail = xml_str + strlen(xml_str);
 				}
 			}
