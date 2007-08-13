@@ -24,6 +24,7 @@ XML_Parser parser;
 char* iso_to_xml(char* iso_msg, const isodef* def, int bmp_flag){
 	char* xml_str; // xml string buffer
 	isomsg unpacked_msg;
+	char  tmp[FIELD_MAX_LENGTH];
 	int err = 0, i = 0;
 	init_message(&unpacked_msg, bmp_flag);
 	err = unpack_message(&unpacked_msg, def, iso_msg);
@@ -39,11 +40,27 @@ char* iso_to_xml(char* iso_msg, const isodef* def, int bmp_flag){
 		for(i = 0; i <= 128; i++){
 			if (i == 1) continue;
 			if (unpacked_msg.fld[i] != NULL){
-				sprintf(tail, "\t<%s\tid=\"%d\"\tvalue=\"%s\"/>\n", XML_CHILD_TAG, i, unpacked_msg.fld[i]);
-				tail = xml_str + strlen(xml_str);
+				memset(tmp, '\0', sizeof(tmp));
+				sprintf(tmp, "\t<%s\tid=\"%d\"\tvalue=\"%s\"/>\n", XML_CHILD_TAG, i, unpacked_msg.fld[i]);
+				if(strlen(tmp) + strlen(xml_str) <= XML_MAX_LENGTH){
+					sprintf(tail, "%s", tmp);
+					tail = xml_str + strlen(xml_str);
+				}else{
+					handle_err(ERR_OVRLEN, SYS, "The xml string's length exceeds the defined maximum value");
+					free(xml_str);
+					return NULL;
+				}
 			}
 		}
-		sprintf(tail, "</%s>\n", XML_ROOT_TAG);
+		memset(tmp, '\0', sizeof(tmp));
+		sprintf(tmp, "</%s>", XML_ROOT_TAG);
+		if(strlen(tmp) + strlen(xml_str) <= XML_MAX_LENGTH){
+				sprintf(tail, "%s", tmp);
+		}else{
+				handle_err(ERR_OVRLEN, SYS, "The xml string will exceed the defined maximum value");
+				free(xml_str);
+				return NULL;
+		}
 		return xml_str;
 	}
 }
@@ -52,10 +69,11 @@ char* iso_to_xml(char* iso_msg, const isodef* def, int bmp_flag){
  * 		\brief		convert a xml string to an iso message
  * 		\param		xml_str the xml input string
  * 		\param 	def is an array of ::isodef structures which refers to all data element definitions of  an iso standard
+ * 		\param		bitmap flag
  * 		\return 	 	the iso message string if having no error
  * 						NULL if having an error
  */
- char* xml_to_iso(char* xml_str, const isodef *def){
+ char* xml_to_iso(char* xml_str, const isodef *def, int bmp_flag){
  	int done=0;
  	char* current_pos = xml_str;
  	char iso_buf[ISO_MAX_LENGTH];
@@ -65,7 +83,7 @@ char* iso_to_xml(char* iso_msg, const isodef* def, int bmp_flag){
 	int err = 0;
  	parser = XML_ParserCreate(NULL);
 
- 	init_message(&iso_msg, BMP_BINARY);
+ 	init_message(&iso_msg, bmp_flag);
 
  	XML_SetUserData(parser, &iso_msg);
 
@@ -81,7 +99,7 @@ char* iso_to_xml(char* iso_msg, const isodef* def, int bmp_flag){
 
 	for(;;){
 		len = (strlen(current_pos) < TMPSIZE)? strlen(current_pos): TMPSIZE;
-		if(len <= TMPSIZE) done = 1;
+		if(len < TMPSIZE) done = 1;
 		if (XML_Parse(parser, current_pos, len, done) == XML_STATUS_ERROR) {
 		  char err_msg[100];
 	      sprintf(err_msg, "Parse error at line %" XML_FMT_INT_MOD "u:\n%s\n",

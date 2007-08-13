@@ -12,8 +12,10 @@
 #define ISO_ALPHANUMERIC 2
 #define ISO_BINARY       3
 
-#define ISO_MAX_LENGTH		4096
-#define FIELD_MAX_LENGTH	2048
+#define ISO_MAX_LENGTH		8192
+#define XML_MAX_LENGTH	8192
+#define PLAIN_MAX_LENGTH	8912
+#define FIELD_MAX_LENGTH	1024
 
 #define IS_FIXED_LEN(def,idx) (def[(idx)].lenflds==0)
 
@@ -26,8 +28,6 @@
 
 #define ISO_VER87	0
 #define ISO_VER93	1
-
-#define XML_MAX_LENGTH	8192
 
 #define XML_ROOT_TAG		"isomsg"
 #define XML_CHILD_TAG		"field"
@@ -77,7 +77,7 @@ void free_message(isomsg *m);
 char* iso_to_xml(char* iso_msg, const isodef *d, int bmp_flag);
 
 /*!	\brief	convert an xml string to iso message		*/
-char* xml_to_iso(char* xml_str, const isodef *def);
+char* xml_to_iso(char* xml_str, const isodef *def, int bmp_flag);
 
 /*!	\func	set data to a field of iso msg	*/
 int set_field(isomsg* m, const isodef *def, int idx, const char* fld);

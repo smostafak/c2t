@@ -375,42 +375,95 @@ void dump_message(FILE *fp, isomsg *m, int fmt_flag)
 {
 	int i;
 	char* xml_str, *tail; // xml string buffer
-	xml_str = (char*) calloc(XML_MAX_LENGTH, sizeof(char));
-	tail = xml_str;
+	char	tmp[FIELD_MAX_LENGTH];
 	switch(fmt_flag){
 		case FMT_PLAIN:
+			xml_str = (char*) calloc(PLAIN_MAX_LENGTH, sizeof(char));
+			tail = xml_str;
 			sprintf(tail, "Field list: ");
 			tail = xml_str + strlen(xml_str);
 			/* print bitmap */
 			for (i =0; i <= 128; i++){
 				if(i==1) continue;
 				if (m->fld[i] != NULL) {
-						sprintf(tail, "%d \t ", i);
-						tail = xml_str + strlen(xml_str);
+						memset(tmp, '\0', sizeof(tmp));
+						sprintf(tmp, "%d \t ", i);
+						if(strlen(tmp) + strlen(xml_str) < PLAIN_MAX_LENGTH){
+							strcpy(tail, tmp);
+							tail = xml_str + strlen(xml_str);
+						}else{
+							char err_msg[100];
+							sprintf(err_msg, "The dumping string's length(%d) will exceed the defined maximum value (%d)", strlen(tmp) + strlen(xml_str), PLAIN_MAX_LENGTH);
+							handle_err(ERR_OVRLEN, SYS, err_msg);
+							free(xml_str);
+							return;
+						}
 				}
 			}
-			sprintf(tail,"\n");
-			tail = xml_str + strlen(xml_str);
-
+			memset(tmp, '\0', sizeof(tmp));
+			sprintf(tmp, "\n ");
+			if(strlen(tmp) + strlen(xml_str) < PLAIN_MAX_LENGTH){
+				strcpy(tail, tmp);
+				tail = xml_str + strlen(xml_str);
+			}else{
+				char err_msg[100];
+				sprintf(err_msg, "The dumping string's length(%d) exceeds the defined maximum value (%d)", strlen(tmp) + strlen(xml_str), PLAIN_MAX_LENGTH);
+				handle_err(ERR_OVRLEN, SYS, err_msg);
+				free(xml_str);
+				return;
+			}
 			for (i = 0; i <= 128; i++) {
 				if(i==1) continue;
 				if (m->fld[i] != NULL) {
-						sprintf(tail, "field #%d = %s\n", i, m->fld[i]);
+					memset(tmp, '\0', sizeof(tmp));
+					sprintf(tmp, "field #%d = %s\n", i, m->fld[i]);
+					if(strlen(tmp) + strlen(xml_str) < PLAIN_MAX_LENGTH){
+						strcpy(tail, tmp);
 						tail = xml_str + strlen(xml_str);
+					}else{
+						char err_msg[100];
+						sprintf(err_msg, "The dumping string's length(%d) exceeds the defined maximum value (%d)", strlen(tmp) + strlen(xml_str), PLAIN_MAX_LENGTH);
+						handle_err(ERR_OVRLEN, SYS, err_msg);
+						free(xml_str);
+						return;
+					}
+
 				}
 			}
 			break;
 		case FMT_XML:
+			xml_str = (char*) calloc(XML_MAX_LENGTH, sizeof(char));
+			tail = xml_str;
 			sprintf(tail, "<?xml	version=\"1.0\"	 ?>\n<%s>\n", XML_ROOT_TAG);
 			tail = xml_str + strlen(xml_str);
 			for(i = 0; i <= 128; i++){
 				if (i == 1) continue;
 				if (m->fld[i] != NULL){
-					sprintf(tail, "\t<%s\tid=\"%d\"\tvalue=\"%s\"/>\n", XML_CHILD_TAG, i, m->fld[i]);
-					tail = xml_str + strlen(xml_str);
+					memset(tmp, '\0', sizeof(tmp));
+					sprintf(tmp, "\t<%s\tid=\"%d\"\tvalue=\"%s\"/>\n", XML_CHILD_TAG, i, m->fld[i]);
+					if(strlen(tmp) + strlen(xml_str) < XML_MAX_LENGTH){
+						sprintf(tail, "%s", tmp);
+						tail = xml_str + strlen(xml_str);
+					}else{
+						char err_msg[100];
+						sprintf(err_msg, "The dumping xml string's length(%d) exceeds the defined maximum value (%d)", strlen(tmp) + strlen(xml_str), XML_MAX_LENGTH);
+						handle_err(ERR_OVRLEN, SYS, err_msg);
+						free(xml_str);
+						return;
+					}
 				}
 			}
-			sprintf(tail, "</%s>\n", XML_ROOT_TAG);
+			memset(tmp, '\0', sizeof(tmp));
+			sprintf(tmp, "</%s>", XML_ROOT_TAG);
+			if(strlen(tmp) + strlen(xml_str) < XML_MAX_LENGTH){
+				sprintf(tail, "%s", tmp);
+			}else{
+				char err_msg[100];
+				sprintf(err_msg, "The dumping xml string's length(%d) exceeds the defined maximum value (%d)", strlen(tmp) + strlen(xml_str), XML_MAX_LENGTH);
+				handle_err(ERR_OVRLEN, SYS, err_msg);
+				free(xml_str);
+				return;
+			}
 			break;
 		default:{
 			char err_msg[100];
