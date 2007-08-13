@@ -57,7 +57,7 @@ char* iso_to_xml(char* iso_msg, const isodef* def, int bmp_flag){
 		if(strlen(tmp) + strlen(xml_str) <= XML_MAX_LENGTH){
 				sprintf(tail, "%s", tmp);
 		}else{
-				handle_err(ERR_OVRLEN, SYS, "The xml string will exceed the defined maximum value");
+				handle_err(ERR_OVRLEN, SYS, "The xml string's length exceeds the defined maximum value");
 				free(xml_str);
 				return NULL;
 		}
@@ -69,7 +69,7 @@ char* iso_to_xml(char* iso_msg, const isodef* def, int bmp_flag){
  * 		\brief		convert a xml string to an iso message
  * 		\param		xml_str the xml input string
  * 		\param 	def is an array of ::isodef structures which refers to all data element definitions of  an iso standard
- * 		\param		bitmap flag
+ * 		\param		bitmap flag that will be used to build the iso message
  * 		\return 	 	the iso message string if having no error
  * 						NULL if having an error
  */
@@ -143,9 +143,16 @@ handle_start(void *data, const char *el, const char **attr)
 				fld_index = strtol(attr[i+1],(char**)NULL, 10);
 				if(errno){
 					fld_index = -1;
+				}else{
+					if( fld_index < 0 || fld_index > 128 || fld_index == 1){ /* the index value is not correct */
+						char	err_msg[100];
+						sprintf(err_msg, "The index value(%d) is not in the [0, 128] range and <> 1", fld_index);
+						handle_err(ERR_OUTRAG, ISO, err_msg);
+						fld_index = -1;
+					}
 				}
 			}else{
-				if((strcmp(attr[i], XML_FIELD_VALUE) ==0) && (i%2 ==0)){
+				if((strcmp(attr[i], XML_FIELD_VALUE) ==0) && (i%2 ==0)){	/* found the value attribute */
 					if(!attr[i+1]) continue;		/*	don't have a value for 'value' attribute, continue */
 					if(fld_data) continue;			/* There are two 'value' attribute, ormit the second one*/
 					fld_data = (char*) calloc(strlen(attr[i+1])+1, sizeof(char));
