@@ -48,30 +48,37 @@ int main()
 			buf = malloc(1024);
 			FILE *fp;
 //			printf("Dava ham fork 2");
-			fp = fopen("dump_msg.log", "wt");
+//			
 			if (recv(membersoc, buf, 1024, 0))
 			{
 				isomsg m;
+				int index;
 				char *xmlbuf, isobuf;
 				//printf("Dava ham fork");
 				printf("\n%s", buf);
-				c
 				buf = buf + 4;
 				printf("\n%s", buf);
 				init_message(&m, BMP_HEXA);
 				unpack_message(&m, iso87, buf);
+/*				for (index = 0; index < 129; index++)
+				{
+					if (m.fld[index] != NULL)
+						printf("Truong thu %d: %s\n", index, m.fld[index]);
+				}*/
+				fp = fopen("dump_msg.log", "w");
 				dump_message(fp, &m, 0);
 				close(fp);
+				free_message(&m);
 				xmlbuf = iso_to_xml(buf, iso87, BMP_HEXA);
-				isobuf = xml_to_iso(xmlbuf, iso87, BMP_HEXA);
+/*				isobuf = xml_to_iso(xmlbuf, iso87, BMP_HEXA);
 				init_message(&m, BMP_HEXA);
 				unpack_message(&m, iso87, isobuf);
 				fp = fopen("xml.log", "wt");
-				dump_message(fp, &m, FMT_XML);
-				close(fp);
+				dump_message(fp, &m, FMT_XML);*/
+				//close(fp);
 				if (xmlbuf != NULL)
 				{
-					printf("\n%s", xmlbuf);
+					//printf("\n%s", xmlbuf);
 					free(xmlbuf);
 				}
 				else
