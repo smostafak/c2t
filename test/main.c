@@ -58,10 +58,10 @@ int main()
 				c
 				buf = buf + 4;
 				printf("\n%s", buf);
+				init_message(&m, BMP_HEXA);
 				unpack_message(&m, iso87, buf);
 				dump_message(fp, &m, 0);
 				close(fp);
-
 				xmlbuf = iso_to_xml(buf, iso87, BMP_HEXA);
 				isobuf = xml_to_iso(xmlbuf, iso87, BMP_HEXA);
 				init_message(&m, BMP_HEXA);
