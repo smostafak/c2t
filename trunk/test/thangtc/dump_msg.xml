@@ -1,0 +1,22 @@
+<?xml	version="1.0"?>
+<isomsg>
+	<field	id="0"	value="0200"/>
+	<field	id="2"	value="6201600053657111"/>
+	<field	id="3"	value="010000"/>
+	<field	id="4"	value="000100000000"/>
+	<field	id="7"	value="0816100300"/>
+	<field	id="11"	value="000753"/>
+	<field	id="12"	value="100300"/>
+	<field	id="13"	value="0816"/>
+	<field	id="15"	value="1101"/>
+	<field	id="18"	value="6011"/>
+	<field	id="22"	value="021"/>
+	<field	id="25"	value="00"/>
+	<field	id="32"	value="970411"/>
+	<field	id="35"	value="6201600053657111=071020115269579"/>
+	<field	id="41"	value="00000001"/>
+	<field	id="42"	value="000000000000001"/>
+	<field	id="43"	value="            BANKNETVN SIMULATOR CLIENT 1"/>
+	<field	id="49"	value="704"/>
+	<field	id="52"	value="111111FFFFFFFFFF"/>
+</isomsg>
