@@ -65,7 +65,7 @@ int main()
 				}
 				fp = fopen("dump_msg.log", "wt");
 				dump_message(fp, &m, 0);
-				close(fp);
+				fclose(fp);
 				free_message(&m);
 				xmlbuf = iso_to_xml(buf, iso87, BMP_HEXA);
 				if (xmlbuf != NULL)
@@ -75,7 +75,7 @@ int main()
 					if (fp != NULL)
 					{
 						fprintf(fp, "%s", xmlbuf);
-						close(fp);
+						fclose(fp);
 						//exit(1);
 					}
 					else
@@ -91,7 +91,7 @@ int main()
 					{
 						fp = fopen("dump_msg_cvt.log", "wt");
 						dump_message(fp, &m, 0);
-						close(fp);
+						fclose(fp);
 						
 					}
 					free(xmlbuf);
