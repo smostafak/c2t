@@ -71,6 +71,7 @@ char* iso_to_xml(char* iso_msg, int iso_len, const isodef* def, int bmp_flag){
  * 		\param		xml_str the xml input string
  * 		\param 	def is an array of ::isodef structures which refers to all data element definitions of  an iso standard
  * 		\param		bitmap flag that will be used to build the iso message
+ * 		\param		iso_len the output iso message's length
  * 		\return 	 	the iso message string if having no error
  * 						NULL if having an error
  */
