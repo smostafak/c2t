@@ -16,18 +16,19 @@ XML_Parser parser;
 /*!	\func		char* iso_to_xml(char* iso_msg)
  * 		\brief		convert a message in iso format to xml format
  * 		\param		iso_msg	a character pointer that points to this message
+ * 		\param		ios_len		the length of the iso message
  * 		\param 	def is an array of ::isodef structures which refers to all data element definitions of  an iso standard
  * 		\param		bmp_flag  a flag that indicates which fomat the bitmap is packaged (binary, hexa)
  * 		\return		a xml string if successfully convert the message	\n
  * 						NULL in case having an error
  */
-char* iso_to_xml(char* iso_msg, const isodef* def, int bmp_flag){
+char* iso_to_xml(char* iso_msg, int iso_len, const isodef* def, int bmp_flag){
 	char* xml_str; // xml string buffer
 	isomsg unpacked_msg;
 	char  tmp[FIELD_MAX_LENGTH];
 	int err = 0, i = 0;
 	init_message(&unpacked_msg, bmp_flag);
-	err = unpack_message(&unpacked_msg, def, iso_msg);
+	err = unpack_message(&unpacked_msg, def, iso_msg, iso_len);
 	if(err > 0){
 		handle_err(WARN, ISO, "Can not unpack the iso message");
 		return NULL;
@@ -73,11 +74,10 @@ char* iso_to_xml(char* iso_msg, const isodef* def, int bmp_flag){
  * 		\return 	 	the iso message string if having no error
  * 						NULL if having an error
  */
- char* xml_to_iso(char* xml_str, const isodef *def, int bmp_flag){
+ char* xml_to_iso(char* xml_str, const isodef *def, int bmp_flag, int* iso_len){
  	int done=0;
  	char* current_pos = xml_str;
  	char iso_buf[ISO_MAX_LENGTH];
- 	int	iso_len = 0;
  	int len = 0;
  	isomsg	iso_msg;
 	int err = 0;
@@ -111,7 +111,7 @@ char* iso_to_xml(char* iso_msg, const isodef* def, int bmp_flag){
 	    current_pos += len;
 	    if(*current_pos=='\0') break;
 	}
-	err = pack_message(&iso_msg, def, iso_buf, &iso_len);
+	err = pack_message(&iso_msg, def, iso_buf, iso_len);
 
 	/* free allocated resources, and return	*/
 	XML_ParserFree(parser);
@@ -120,7 +120,7 @@ char* iso_to_xml(char* iso_msg, const isodef* def, int bmp_flag){
 	if(err){
 		return NULL;
 	}else{
-		iso_buf[iso_len] = '\0';
+		iso_buf[*iso_len] = '\0';
 		return iso_buf;
 	}
  }

@@ -214,25 +214,33 @@ int pack_message(const isomsg *m, const isodef *d, char *buf, int* buf_len)
  * 		\param 	m is an ::isomsg structure pointer that contains all message elements which are unpacked
  * 		\param 	d is an array of ::isodef structures which refers to all data element definitions of  an iso standard
  * 		\param		buf is the iso message buffer that contains the iso message that needs unpacking.
+ * 		\param		buf_len is the length of the iso message buffer
  * 		\returns    0 in case successful unpacking \n
  * 						error number in case an error occured
  */
-int  unpack_message(isomsg *m, const isodef *d, const char *buf)
+int  unpack_message(isomsg *m, const isodef *d, const char *buf, int buf_len)
 {
 	int flds;
-	int i, sys_err_code;
+	int i;
 	int len;
     char tmp[20];
     Bytes byte_tmp, hexa_tmp;
-    int flderr[129];
+    const char* buf_start = buf;
 
 	/* Field 0 is mandatory and fixed length. */
 	if (d[0].lenflds != 0) {
-		/* FIXME: error */
 		/*The length define is not correct*/
 		handle_err(ERR_IVLLEN, ISO, "Definition 0 --> The length define is not correct");
 		return ERR_IVLLEN;
 	}
+
+	if(d[0].flds > buf_len){
+		char err_msg[100];
+		sprintf(err_msg, "The ISO message buffer's length(%d) is shorter than the length definition of field 0 (%d) ", buf_len, d[0].lenflds);
+		handle_err(ERR_SHTBUF, ISO, err_msg);
+		return ERR_SHTBUF;
+	}
+
 	m->fld[0] = (char *) malloc((d[0].flds + 1) * sizeof(char));
 	if(!m->fld[0])
 	{
@@ -261,20 +269,33 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 			flds = 64;
 		}
 		m->fld[1] = (char *) calloc(flds/8 + 1, sizeof(char));
-		if (!m->fld[1])
-		{
+		if (!m->fld[1]){
 			char err_msg[100];
 			sprintf(err_msg, "%s:%d --> Can't allocate memory for field 1", __FILE__, __LINE__);
 			handle_err(ERR_OUTMEM, SYS, err_msg);
 			return ERR_OUTMEM;
 		}
-		memcpy(m->fld[1], buf, flds/8);
-		buf += flds/8;
+		if( (buf - buf_start + flds/8) > buf_len){
+			memcpy(m->fld[1], buf, flds/8);
+			buf += flds/8;
+		}else{
+			char err_msg[100];
+			sprintf(err_msg, "The ISO message buffer's length(%d) is too short, stoped at field 1", buf_len);
+			handle_err(ERR_SHTBUF, ISO, err_msg);
+			return ERR_SHTBUF;
+		}
 	}else{
 		if(hexachar2int(buf[0]) & 0x08){
 			flds = 128;
 		} else {
 			flds = 64;
+		}
+		/* Handle buffer too short error	*/
+		if((buf - buf_start + flds/4) > buf_len){
+			char err_msg[100];
+			sprintf(err_msg, "The ISO message buffer's length(%d) is too short, stoped at field 1", buf_len);
+			handle_err(ERR_SHTBUF, ISO, err_msg);
+			return ERR_SHTBUF;
 		}
 		hexa_tmp.length = flds/4;
 		hexa_tmp.bytes = (char *) calloc(hexa_tmp.length, sizeof(char));
@@ -324,6 +345,14 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 				len = d[i].flds;
 			}
 
+			/* Handle the buffer too short error */
+			if(buf - buf_start + len + d[i].lenflds > buf_len){
+				char err_msg[100];
+				sprintf(err_msg, "The ISO message buffer's length(%d) is too short, stoped at field %d", buf_len, i);
+				handle_err(ERR_SHTBUF, ISO, err_msg);
+				return ERR_SHTBUF;
+			}
+
 			switch (d[i].format) {
 			case ISO_NUMERIC: /* Fallthrough */
 			case ISO_ALPHANUMERIC:
@@ -354,9 +383,6 @@ int  unpack_message(isomsg *m, const isodef *d, const char *buf)
 			}
 			memcpy(m->fld[i], buf, len);
 			m->fld[i][len] = 0;
-			//Check the value of this field correct format or not
-			if (flderr[i] == 0)
-				flderr[i] = check_fld(m->fld[i], i, d);
 			buf += len;
 		}
 	}
