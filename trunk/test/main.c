@@ -42,52 +42,68 @@ int main()
 		if ((membersoc = accept(mssock, (struct sockaddr_in *)&client_add, &soklen)) < 0) {
         perror("server: accept");
         exit(1);
-		}
 		
-//			printf("Dava ham fork 1");
+		}	
+		if (!fork())
+		{
 			buf = malloc(1024);
 			FILE *fp;
-//			printf("Dava ham fork 2");
-//			
 			if (recv(membersoc, buf, 1024, 0))
 			{
+				
 				isomsg m;
 				int index;
-				char *xmlbuf, isobuf;
-				//printf("Dava ham fork");
-				printf("\n%s", buf);
+				char *xmlbuf, *isobuf;
+//				printf("\n%s", buf);
 				buf = buf + 4;
 				printf("\n%s", buf);
 				init_message(&m, BMP_HEXA);
-				unpack_message(&m, iso87, buf);
-/*				for (index = 0; index < 129; index++)
+				if (unpack_message(&m, iso87, buf))
 				{
-					if (m.fld[index] != NULL)
-						printf("Truong thu %d: %s\n", index, m.fld[index]);
-				}*/
-				fp = fopen("dump_msg.log", "w");
+					printf("\nError during unpack message");
+					exit(1);
+				}
+				fp = fopen("dump_msg.log", "wt");
 				dump_message(fp, &m, 0);
 				close(fp);
 				free_message(&m);
 				xmlbuf = iso_to_xml(buf, iso87, BMP_HEXA);
-/*				isobuf = xml_to_iso(xmlbuf, iso87, BMP_HEXA);
-				init_message(&m, BMP_HEXA);
-				unpack_message(&m, iso87, isobuf);
-				fp = fopen("xml.log", "wt");
-				dump_message(fp, &m, FMT_XML);*/
-				//close(fp);
 				if (xmlbuf != NULL)
 				{
-					//printf("\n%s", xmlbuf);
+					printf("Create xml dump message");
+					fp = fopen("dump_msg.xml", "wt");
+					if (fp != NULL)
+					{
+						fprintf(fp, "%s", xmlbuf);
+						close(fp);
+						//exit(1);
+					}
+					else
+						printf("\n Can not create file");
+					isobuf = xml_to_iso(xmlbuf, iso87, BMP_HEXA);
+					printf(xmlbuf);
+					if (isobuf == NULL)
+					{
+						printf("\nKo unpack dc message dang iso");
+						exit(1);
+					}
+					else	
+					{
+						fp = fopen("dump_msg_cvt.log", "wt");
+						dump_message(fp, &m, 0);
+						close(fp);
+						
+					}
 					free(xmlbuf);
 				}
 				else
 				{
-					printf("Error during convert message");
-					//exit(1);
+					printf("\nError during convert message");
+					exit(1);
 				}
 			}
 		
+		}
 		close(membersoc);
 	
 	}
