@@ -27,6 +27,9 @@
 #define ERR_XMLPAS		5001
 #define ERR_IVLIDX		5002
 
+/*!	\brief	buffer-related errors	from 6001 to 7000	*/
+#define ERR_SHTBUF		6001
+
 
 #define ISO 1
 #define SYS 2
@@ -66,6 +69,7 @@ static const errmsg errdef[] ={
 		{ERR_PASMEM, "Couldn't allocate memory for parser"},
 		{ERR_XMLPAS, "The XML document is not well-formed"},
 		{ERR_IVLIDX,"Invalid index value"},
+		{ERR_SHTBUF,"The buffer is too short"},
 }; /*The format error*/
 
 /*!	\func	void iso_err(int *fldErr, FILE *fp)

@@ -223,7 +223,7 @@ static const isodef iso87[] = {
     /*087*/ {ISO_NUMERIC, 0, 16, "Credits, reversal amount"},
     /*088*/ {ISO_NUMERIC, 0, 16, "Debits, amount"},
     /*089*/ {ISO_NUMERIC, 0, 16, "Debits, reversal amount"},
-    /*090*/ {ISO_NUMERIC, 0, 10, "Authorizations, reversal number"},
+    /*090*/ {ISO_NUMERIC, 0, 42, "Authorizations, reversal number"},
     /*091*/ {ISO_NUMERIC, 0, 3, "Country code, transaction Dest. Inst."},
     /*092*/ {ISO_NUMERIC, 0, 3, "Country code, transaction Orig. Inst."},
     /*093*/ {ISO_NUMERIC, 2, 11, "Transaction Dest. Inst. Id code"},
