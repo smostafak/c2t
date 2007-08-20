@@ -1,3 +1,6 @@
+/*!	\file	convert.c
+ * 		\brief	This file contains all converting utilities of this iso8583 library
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include	 <string.h>
@@ -11,7 +14,7 @@
 
 int Depth;
 XML_Parser parser;
-
+static int err_no;
 
 /*!	\func		char* iso_to_xml(char* iso_msg)
  * 		\brief		convert a message in iso format to xml format
@@ -82,6 +85,8 @@ char* iso_to_xml(char* iso_msg, int iso_len, const isodef* def, int bmp_flag){
  	int len = 0;
  	isomsg	iso_msg;
 	int err = 0;
+	/* reset the err_no */
+	err_no = 0;
  	parser = XML_ParserCreate(NULL);
 
  	init_message(&iso_msg, bmp_flag);
@@ -112,16 +117,20 @@ char* iso_to_xml(char* iso_msg, int iso_len, const isodef* def, int bmp_flag){
 	    current_pos += len;
 	    if(*current_pos=='\0') break;
 	}
-	err = pack_message(&iso_msg, def, iso_buf, iso_len);
-
 	/* free allocated resources, and return	*/
 	XML_ParserFree(parser);
-	free_message(&iso_msg);
 
-	if(err){
+	if(err_no){
+		free_message(&iso_msg);
+		/* reset the erro_no before return */
+		err_no = 0;
 		return NULL;
 	}else{
+		err = pack_message(&iso_msg, def, iso_buf, iso_len);
 		iso_buf[*iso_len] = '\0';
+		free_message(&iso_msg);
+		/* reset the erro_no before return */
+		err_no = 0;
 		return iso_buf;
 	}
  }
@@ -135,6 +144,8 @@ handle_start(void *data, const char *el, const char **attr)
   int i = 0;
   int fld_index = -1;
   char* fld_data = NULL;
+  /* check err_no */
+  if(err_no) return;
   isomsg* tmp = (isomsg*)data;
   if(strcmp(el, XML_CHILD_TAG) ==0){
 		while(attr[i]){
@@ -168,8 +179,9 @@ handle_start(void *data, const char *el, const char **attr)
 			memcpy(tmp->fld[fld_index], fld_data, strlen(fld_data));
 		}else{
 			char err_msg[100];
-			sprintf(err_msg, "Syntax error at line: %d of the parsing xml document", Depth);
+			sprintf(err_msg, "Syntax error at line: %d of the parsing xml document, either index attribute or value attribute is not correct", Depth);
 			handle_err(WARN,ISO, err_msg);
+			err_no = ERR_XMLSYT;
 		}
   }
   Depth++;

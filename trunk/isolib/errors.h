@@ -26,6 +26,7 @@
 #define ERR_PASMEM	5000
 #define ERR_XMLPAS		5001
 #define ERR_IVLIDX		5002
+#define ERR_XMLSYT		5003
 
 /*!	\brief	buffer-related errors	from 6001 to 7000	*/
 #define ERR_SHTBUF		6001
@@ -70,6 +71,7 @@ static const errmsg errdef[] ={
 		{ERR_XMLPAS, "The XML document is not well-formed"},
 		{ERR_IVLIDX,"Invalid index value"},
 		{ERR_SHTBUF,"The buffer is too short"},
+		{ERR_XMLSYT,"Xml syntax error"}
 }; /*The format error*/
 
 /*!	\func	void iso_err(int *fldErr, FILE *fp)
