@@ -62,10 +62,15 @@ int pack_message(const isomsg *m, const isodef *d, char *buf, int* buf_len)
 	Bytes byte_tmp, hexa_tmp;
 	int flderr[129];
 
+	if(m->fld[0] == NULL){
+		handle_err(ERR_IVLFMT, ISO, "Field 0 --> This field does not exist");
+		return ERR_IVLFMT;
+	}
+
 	if (strlen(m->fld[0]) != d[0].flds || d[0].lenflds != 0) {
 		/* FIXME: error */
 		/*This error is the length of field is not correct*/
-		handle_err(ERR_IVLLEN, ISO, "Field 0 --> Length is over its length in iso8583 definition");
+		handle_err(ERR_IVLLEN, ISO, "Field 0 --> Length is not the same as its iso8583 definition length");
 		return ERR_IVLLEN;
 	}
 	memcpy(buf, m->fld[0], d[0].flds);
@@ -735,7 +740,7 @@ int get_field(char *buf, const isodef *def, int idx, char *fld, int bmp_flag)
 	else {
 		/* the field not exist */
 		sprintf(err_msg, "The fied %d is not exist", idx);
-		handle_err(ERR_IVLFLD, ISO, err_msg);		
+		handle_err(ERR_IVLFLD, ISO, err_msg);
 		return ERR_IVLFLD; /*invalid format*/
 	}
 	return 0;
