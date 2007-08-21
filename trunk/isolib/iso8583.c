@@ -531,7 +531,7 @@ void free_message(isomsg *m)
  *  	\brief		set data to a field of iso msg.
  */
 
-int set_field(isomsg* m, const isodef *def, int idx, const char* fld)
+int set_field(isomsg* m, const isodef *def, int idx, const char* fld, int fld_len)
 {
 	char err_msg[100];
 
@@ -545,7 +545,7 @@ int set_field(isomsg* m, const isodef *def, int idx, const char* fld)
 	}
 
 	int format = def[idx].format;
-	int len = strlen(fld);
+	int len = fld_len;
 
 	if (len > def[idx].flds) {
 		/*
@@ -603,9 +603,10 @@ int set_field(isomsg* m, const isodef *def, int idx, const char* fld)
  *  	\brief		get data of a field from the msg buff.
  */
 
-int get_field(char *buf, const isodef *def, int idx, char *fld, int bmp_flag)
+int get_field(char* buf, const isodef *def, int idx, char* fld, int * fld_len, int bmp_flag)
 {
 	char *pos = &buf[0];
+	int bmp_len;
 
 	char err_msg[100];
 
@@ -629,6 +630,7 @@ int get_field(char *buf, const isodef *def, int idx, char *fld, int bmp_flag)
 		/* the field is mti */
 		memcpy(fld,pos,def[0].flds);
 		fld[def[0].flds] = 0;
+		*fld_len =  def[0].flds;
 		return 0;
 	}
 
@@ -652,9 +654,10 @@ int get_field(char *buf, const isodef *def, int idx, char *fld, int bmp_flag)
 		} else {
 			flds = 64;
 		}
-		memcpy(bitmap, pos, flds/8);
-		bitmap[flds/8] = 0;
-		pos += flds/8;
+		bmp_len = flds/8;
+		memcpy(bitmap, pos, bmp_len);
+		bitmap[bmp_len] = 0;
+		pos += bmp_len;
 	}else{
 		if(hexachar2int(*pos) & 0x08) {
 			flds = 128;
@@ -675,19 +678,19 @@ int get_field(char *buf, const isodef *def, int idx, char *fld, int bmp_flag)
 			free(hexa_tmp.bytes);
 			return ERR_HEXBYT;
 		}
-
-		memcpy(bitmap, byte_tmp.bytes, byte_tmp.length/8);
+		bmp_len = byte_tmp.length/8;
+		memcpy(bitmap, byte_tmp.bytes, bmp_len);
 		free(hexa_tmp.bytes);
 		free(byte_tmp.bytes);
-		bitmap[byte_tmp.length/8] = 0;
+		bitmap[bmp_len] = 0;
 		pos += flds/4;
 	}
 
 	if (idx == 1) {
 		/* the field is bitmap */
-		int len = strlen(bitmap);
-		memcpy(fld,bitmap,len);
-		fld[len] = 0;
+		*fld_len = bmp_len;
+		memcpy(fld,bitmap,bmp_len);
+		fld[bmp_len] = 0;
 		return 0;
 	}
 
@@ -730,6 +733,7 @@ int get_field(char *buf, const isodef *def, int idx, char *fld, int bmp_flag)
 				}
 
 				if (i == idx) {
+					*fld_len = len; 
 					memcpy(fld, pos, len);
 					fld[len] = '\0';
 				}
