@@ -179,7 +179,7 @@ handle_start(void *data, const char *el, const char **attr)
 			memcpy(tmp->fld[fld_index], fld_data, strlen(fld_data));
 		}else{
 			char err_msg[100];
-			sprintf(err_msg, "Syntax error at line: %d of the parsing xml document, either index attribute or value attribute is not correct", Depth);
+			sprintf(err_msg, "Syntax error at line: %d of the parsing xml document, either index attribute or value attribute is not correct", XML_GetCurrentLineNumber(parser));
 			handle_err(WARN,ISO, err_msg);
 			err_no = ERR_XMLSYT;
 		}
