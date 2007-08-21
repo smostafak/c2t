@@ -80,9 +80,9 @@ char* iso_to_xml(char* iso_msg, int iso_len, const isodef *d, int bmp_flag);
 char* xml_to_iso(char* xml_str, const isodef *def, int bmp_flag, int* iso_len);
 
 /*!	\func	set data to a field of iso msg	*/
-int set_field(isomsg* m, const isodef *def, int idx, const char* fld);
+int set_field(isomsg* m, const isodef *def, int idx, const char* fld, int fld_len);
 /*!	\func	get data from a field of iso msg	*/
-int get_field(char* buf, const isodef *def, int idx, char* fld, int bmp_flag);
+int get_field(char* buf, const isodef *def, int idx, char* fld, int * fld_len, int bmp_flag);
 
 
 
