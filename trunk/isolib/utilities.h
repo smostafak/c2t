@@ -13,7 +13,7 @@ struct  bytearray{
 };
 
 /*!	\brief	Bytes is the alias of "struct bytearray" */
-typedef struct  bytearray	Bytes;
+typedef struct  bytearray	bytes;
 
 /*		\fn 		int 	hexachar2int(char );
  * 		\brief	This function converts a hexa character to its correspondent integer value 	
@@ -23,7 +23,7 @@ int 	hexachar2int(char );
 /*		\fn		char*	hexachars2bytes(char*);
  * 		\brief	This function converts a hexa character array to its correspondent byte array
  */
-int	hexachars2bytes(Bytes* , Bytes* );
+int	hexachars2bytes(bytes* , bytes* );
 
 /*!	\fn	char int2hexachar(int num)	
  * 		\brief	This function convert an integer number to its correspondent hexa character
@@ -33,7 +33,7 @@ char	int2hexachar(int );
 /*		\fn		char* bytes2hexachars(char*);
  * 		\brief	This function converts a bytes character array to its conrrespondent hexa character array
  */
-int bytes2hexachars(Bytes*, Bytes*);
+int bytes2hexachars(bytes*, bytes*);
  
 int	int2bin(unsigned int);
 
