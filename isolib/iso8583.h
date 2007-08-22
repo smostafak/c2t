@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <time.h>
+#include "utilities.h"
 
 #define ISO_BITMAP       0
 #define ISO_NUMERIC      1
@@ -63,8 +64,8 @@ typedef struct {
 typedef struct {
 	/*! \brief The flag to identify whether the bitmap is in binary or hexa format */
 	int bmp_flag;
-	/*! \brief The 129 field pointer array		*/
-	char *fld[129];
+	/*! \brief The 129 field pointer array, each memeber cotains a byte array and its length */
+	bytes fld[129];
 } isomsg;
 
 void init_message(isomsg *m, int bmp_flag);
