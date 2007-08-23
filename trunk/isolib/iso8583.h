@@ -70,11 +70,24 @@ typedef struct {
 	bytes fld[129];
 } isomsg;
 
-void init_message(isomsg *m, int bmp_flag);
-int pack_message(const isomsg *m, char *buf, int* buf_len);
-int unpack_message(isomsg *m, const char *buf, int buf_len);
-void dump_message(FILE *fp, isomsg *m, int fmt_flag);
-void free_message(isomsg *m);
+ /*! 		\brief	Initialize an ISO message struct - i.e. set all entries to NULL */
+void init_message(isomsg*, const int, const isodef* );
+
+/*!	\brief  pack the content of an ISO message  into a buffer. \n
+ * 				 NOTE: the buffer must be large enough to contain the packed message.
+ */
+int pack_message(const isomsg *, char*, int*);
+
+ /*! 		\brief 		Using the definition d, unpack the content of buf into the ISO message struct m. */
+int unpack_message(isomsg *, const char *, int);
+
+void dump_message(FILE*, isomsg*, int );
+
+/*!  	\brief		Free memory used by the ISO message struct m. */
+void free_message(isomsg *);
+
+/*! 	\brief	assign an iso definition to m */
+void set_isodef(isomsg*, isodef*);
 
 /*!	\brief	convert an iso message to xml format		*/
 char* iso_to_xml(char* iso_msg, int iso_len, int bmp_flag);
