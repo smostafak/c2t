@@ -50,6 +50,11 @@ int bytes2hexachars(bytes*, bytes*);
  */
  int verify_bytes(bytes*);
 
+ /*!		\fn		void free_bytes(bytes*);
+ * 			\brief	This function frees a bytes struct then makes it empty that is its bytes = NULL and its length = 0
+ */
+ void free_bytes(bytes*);
+
 /*!		\fn 	set_data(bytes*, char*)
  * 			\brief	This function copy data to a bytes struct
  */
@@ -58,7 +63,7 @@ int bytes2hexachars(bytes*, bytes*);
 /*!		\fn 	export_data(bytes*, char*, int*)
  * 			\brief	This function copy data from a bytes struct to a buffer
  */
- void export_data(bytes*, char**, int*);
+ void export_data(bytes*, char*, int*);
 
  /*!		\fn 	set_length(bytes*, int)
  * 			\brief	This function sets length for a bytes struct

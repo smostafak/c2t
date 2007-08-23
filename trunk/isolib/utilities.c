@@ -148,7 +148,6 @@ int bytes2hexachars(bytes* binary_bytes, bytes* hexa_chars){
  * 			\param  ptrbytes a bytes struct pointer that will be made empty
  */
  void empty_bytes(bytes* ptrbytes){
- 	if(ptrbytes->bytes != NULL) free(ptrbytes->bytes);
  	ptrbytes->bytes = NULL;
  	ptrbytes->length = 0;
  }
@@ -172,11 +171,10 @@ int bytes2hexachars(bytes* binary_bytes, bytes* hexa_chars){
  * 			\param		ptrchar the data buffer to which the data will be copied
  * 			\param		ptrlen 	the length of the copied data will be set to this integer pointer
  */
- void export_data(bytes* ptrbytes, char** ptrchar, int* ptrlen){
+ void export_data(bytes* ptrbytes, char* ptrchar, int* ptrlen){
  		*ptrlen = ptrbytes->length;
- 		*ptrchar = (char*) calloc(*ptrlen+1, sizeof(char));
- 		if(*ptrchar != NULL)
- 		memcpy(*ptrchar, ptrbytes->bytes, *ptrlen);
+ 		if(ptrchar != NULL)
+ 		memcpy(ptrchar, ptrbytes->bytes, *ptrlen);
  }
 
 
@@ -198,7 +196,14 @@ int bytes2hexachars(bytes* binary_bytes, bytes* hexa_chars){
 		return ptrbytes->length;
  }
 
-
+/*!		\fn		void free_bytes(bytes*);
+ * 			\brief	This function frees a bytes struct then makes it empty that is its bytes = NULL and its length = 0
+ * 			\param  ptrbytes a bytes struct pointer that will be made empty
+ */
+ void free_bytes(bytes* ptrbytes){
+ 		if(ptrbytes->bytes != NULL) free(ptrbytes->bytes);
+ 		empty_bytes(ptrbytes);
+ }
 
 int	int2bin(unsigned int in){
 	int i =0 ;
