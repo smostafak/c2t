@@ -55,7 +55,7 @@ char	int2hexachar(int num){
  * 		\return		the number of bytes of the result array
  * 						-1 if having an error.
  */
-int	hexachars2bytes(Bytes* hexa_chars, Bytes* binary_bytes){
+int	hexachars2bytes(bytes* hexa_chars, bytes* binary_bytes){
 	int i, tmp, byte_len;
 
 	byte_len = hexa_chars->length/2 +1;
@@ -99,7 +99,7 @@ int	hexachars2bytes(Bytes* hexa_chars, Bytes* binary_bytes){
  * 		\return	the pointer of the correspondent hexa character array of this hexa byte array
  * 					NULL if having error
  */
-int bytes2hexachars(Bytes* binary_bytes, Bytes* hexa_chars){
+int bytes2hexachars(bytes* binary_bytes, bytes* hexa_chars){
 		int i, tmp;
 		hexa_chars->length = binary_bytes->length / 4;
 		hexa_chars->bytes = (char*) calloc(hexa_chars->length, sizeof(char));
@@ -120,6 +120,85 @@ int bytes2hexachars(Bytes* binary_bytes, Bytes* hexa_chars){
 		}
 		return 0;
 }
+
+/*!		\fn		int verify_data(bytes*)
+ * 			\brief	This function check whether a bytes struct has data or not
+ * 			\param	 ptrbytes a bytes struct pointer that will be verified
+ * 			\return  HASDATA (0) if ptrbytes->bytes != NULL and ptrbytes->length > 0 \n
+ * 						LENZERO	 (1) if ptrbytes->bytes != NULL and ptrbytes ->length <=0 \n
+ * 						DATNULL	 (2) if ptrbytes->bytes == NULL and ptrbytes->length !=0 \n
+ * 						EMTDATA (3) in ptrbytes->bytes == NULL and ptrbytes->length ==0 \n
+ */
+ int verify_bytes(bytes* ptrbytes){
+ 	if(ptrbytes->bytes != NULL){
+ 		if(ptrbytes->length > 0)
+ 			return HASDATA;
+ 		else
+ 			return LENZERO;
+ 	}else{
+ 		if(ptrbytes->length != 0)
+ 			return DATNULL;
+  		else
+ 			return EMTDATA;
+ 	}
+ }
+
+ /*!		\fn		void empty_bytes(bytes*);
+ * 			\brief	This function make a bytes struct empty that is its bytes = NULL and its length = 0
+ * 			\param  ptrbytes a bytes struct pointer that will be made empty
+ */
+ void empty_bytes(bytes* ptrbytes){
+ 	if(ptrbytes->bytes != NULL) free(ptrbytes->bytes);
+ 	ptrbytes->bytes = NULL;
+ 	ptrbytes->length = 0;
+ }
+
+/*!		\fn 			copy_data(bytes*, char*)
+ * 			\brief		This function copies data to a bytes struct
+ * 			\param		ptrbytes a bytes struct pointer that will be set data
+ * 			\param		the data buffer that will be copied to ptrbytes
+ * 			\param		the length of ptrchar
+ */
+ void copy_data(bytes* ptrbytes, const char* ptrchar, int len){
+ 		ptrbytes->length = len;
+ 		ptrbytes->bytes = (char*)calloc(ptrbytes->length, sizeof(char));
+ 		if(ptrbytes->bytes != NULL)
+		memcpy(ptrbytes->bytes, ptrchar, len);
+ }
+
+ /*!		\fn 	export_data(bytes*, char*, int*)
+ * 			\brief	This function copy data from a bytes struct to a buffer
+ * 			\param		ptrbytes a bytes struct pointer whose data will be copied
+ * 			\param		ptrchar the data buffer to which the data will be copied
+ * 			\param		ptrlen 	the length of the copied data will be set to this integer pointer
+ */
+ void export_data(bytes* ptrbytes, char** ptrchar, int* ptrlen){
+ 		*ptrlen = ptrbytes->length;
+ 		*ptrchar = (char*) calloc(*ptrlen+1, sizeof(char));
+ 		if(*ptrchar != NULL)
+ 		memcpy(*ptrchar, ptrbytes->bytes, *ptrlen);
+ }
+
+
+ /*!		\fn 	set_length(bytes*, int)
+ * 			\brief	This function sets length for a bytes struct
+ * 			\param		ptrbytes a bytes struct pointer that will be set length
+ * 			\param		len the length that will be set as the length of ptrbytes
+ */
+ void set_length(bytes* ptrbytes, int len){
+		ptrbytes->length = len;
+ }
+
+ /*!	\fn int get_length(bytes*)
+ * 		\brief	This function gets length of a bytes struct
+ * 		\param		ptrbytes a bytes struct pointer
+ * 		\return		ptrbytes->length;
+ */
+ int get_length(bytes* ptrbytes){
+		return ptrbytes->length;
+ }
+
+
 
 int	int2bin(unsigned int in){
 	int i =0 ;
