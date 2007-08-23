@@ -159,7 +159,7 @@ int bytes2hexachars(bytes* binary_bytes, bytes* hexa_chars){
  * 			\param		the data buffer that will be copied to ptrbytes
  * 			\param		the length of ptrchar
  */
- void copy_data(bytes* ptrbytes, const char* ptrchar, int len){
+ void import_data(bytes* ptrbytes, const char* ptrchar, int len){
  		ptrbytes->length = len;
  		ptrbytes->bytes = (char*)calloc(ptrbytes->length, sizeof(char));
  		if(ptrbytes->bytes != NULL)
