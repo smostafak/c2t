@@ -53,7 +53,7 @@ int bytes2hexachars(bytes*, bytes*);
 /*!		\fn 	set_data(bytes*, char*)
  * 			\brief	This function copy data to a bytes struct
  */
- void copy_data(bytes*, const char*, int);
+ void import_data(bytes*, const char*, int);
 
 /*!		\fn 	export_data(bytes*, char*, int*)
  * 			\brief	This function copy data from a bytes struct to a buffer
