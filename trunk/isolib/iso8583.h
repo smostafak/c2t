@@ -64,18 +64,20 @@ typedef struct {
 typedef struct {
 	/*! \brief The flag to identify whether the bitmap is in binary or hexa format */
 	int bmp_flag;
+	/*! \brief The iso definition that the fields of this iso message conform to */
+	isodef* iso_def;
 	/*! \brief The 129 field pointer array, each memeber cotains a byte array and its length */
 	bytes fld[129];
 } isomsg;
 
 void init_message(isomsg *m, int bmp_flag);
-int pack_message(const isomsg *m, const isodef *d, char *buf, int* buf_len);
-int unpack_message(isomsg *m, const isodef *d, const char *buf, int buf_len);
+int pack_message(const isomsg *m, char *buf, int* buf_len);
+int unpack_message(isomsg *m, const char *buf, int buf_len);
 void dump_message(FILE *fp, isomsg *m, int fmt_flag);
 void free_message(isomsg *m);
 
 /*!	\brief	convert an iso message to xml format		*/
-char* iso_to_xml(char* iso_msg, int iso_len, const isodef *d, int bmp_flag);
+char* iso_to_xml(char* iso_msg, int iso_len, int bmp_flag);
 
 /*!	\brief	convert an xml string to iso message		*/
 char* xml_to_iso(char* xml_str, const isodef *def, int bmp_flag, int* iso_len);
