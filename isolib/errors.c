@@ -167,9 +167,12 @@ int handle_err(int err_code, int err_type, char *moredesc)
 	time_t t;
 	struct tm *ptr;
 	char *desc;
-	filename = "log.txt";
+//	filename = "log.txt";
 	t = time(0);
 	ptr = localtime(&t);
+	filename = malloc(100);
+	strftime(filename, 100, "%d-%m-%Y", ptr);
+	strcat(filename, ".log");
 	fp = fopen(filename, "a+");
 	if (!fp)
 	{
