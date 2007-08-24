@@ -95,7 +95,7 @@ char *scan_err(int err_code);
  * 		\param def: the definition is used to parse msg
  * 		\output: the errors code if have or zero (not error)
 */
-int check_fld(const char *value, int idx, const isodef *def);
+int check_fld(const char *value, int len, int idx, const isodef *def);
 
 /*!	\func	void *sys_err(int err_code, FILE *fp)
  * 		\brief	This function is used to process the system error (such as out of memory ...)
