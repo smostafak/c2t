@@ -45,15 +45,15 @@ int pack_message(const isomsg *m, char *buf, int *buf_len)
 	char *bitmap;
 	int len;
 	char tmp[20];
-	Bytes byte_tmp, hexa_tmp;
+	bytes byte_tmp, hexa_tmp;
 	int flderr[129];
 
-	if(m->fld[0] == NULL){
+	if(verify_bytes(&m->fld[0])){
 		handle_err(ERR_IVLFMT, ISO, "Field 0 --> This field does not exist");
 		return ERR_IVLFMT;
 	}
 
-	if (strlen(m->fld[0]) != d[0].flds || d[0].lenflds != 0) {
+	if (m->fld[0].length != d[0].flds || d[0].lenflds != 0) {
 		/* FIXME: error */
 		/*This error is the length of field is not correct*/
 		handle_err(ERR_IVLLEN, ISO, "Field 0 --> Length is not the same as its iso8583 definition length");
