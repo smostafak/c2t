@@ -65,7 +65,7 @@ typedef struct {
 	/*! \brief The flag to identify whether the bitmap is in binary or hexa format */
 	int bmp_flag;
 	/*! \brief The iso definition that the fields of this iso message conform to */
-	isodef* iso_def;	
+	const isodef* iso_def;	
 	/*! \brief The 129 field pointer array, each memeber cotains a byte array and its length */
 	bytes fld[129];
 } isomsg;
