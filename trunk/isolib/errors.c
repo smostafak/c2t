@@ -99,10 +99,9 @@ char* scan_err(int err_code)
  * 		\param def: the definition is used to parse msg
  * 		\output: the errors code if have or zero (not error)
 */
-int check_fld(const char *value, int idx, const isodef *def)
+int check_fld(const char *value, int len, int idx, const isodef *def)
 {
-	int i;
-	int len = strlen(value); //The length of the value
+	int i;	
 	int format = def[idx].format;
 	
 	switch (format) {
