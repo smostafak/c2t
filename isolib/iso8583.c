@@ -15,13 +15,13 @@
  * 		\param  bmp_flag 
  * 		\param  def is an ::isodef
  */
-void init_message(isomsg*, const int bmp_flag, const isodef *def)
+void init_message(isomsg *m, const int bmp_flag, const isodef *def)
 {
 	int i;
 	m->bmp_flag = bmp_flag;	/*!	Default format is binary format */
 	m->iso_def = def;
 	for (i = 0; i <= 128; i++) {
-		m->fld[i] = NULL;
+		empty_bytes(&m->fld[i]);
 	}
 }
 
@@ -538,15 +538,15 @@ int set_field(isomsg* m, int idx, const char *fld, int fld_len)
 		return ERR_OVRLEN;
 	}
 	
-	//int err_code = check_fld(fld, idx, def);
-	//if (err_code) {
+	int err_code = check_fld(fld, fld_len, idx, def);
+	if (err_code) {
 		/*
 		 * The value of this field is invalid
 		 */
-	//	sprintf(err_msg, "%s:%d --> The value of field %d is invalid", __FILE__, __LINE__, idx);
-	//	handle_err(err_code, ISO, err_msg);
-	//	return err_code;
-	//}
+		sprintf(err_msg, "%s:%d --> The value of field %d is invalid", __FILE__, __LINE__, idx);
+		handle_err(err_code, ISO, err_msg);
+		return err_code;
+	}
 
 	char *field = (char *)malloc((fld_len + 1)*sizeof(char));
 	if (field == NULL) {
