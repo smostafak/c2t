@@ -262,6 +262,6 @@ static const isodef iso87[] = {
     /*125*/ {ISO_ALPHANUMERIC, 3, 50, "Network management information"},
     /*126*/ {ISO_ALPHANUMERIC, 3, 6, "Issuer trace id"},
     /*127*/ {ISO_ALPHANUMERIC, 3, 999, "Reserved for private use"},
-    /*128*/ {ISO_BINARY, 0, 6, "Message authentication code"}
+    /*128*/ {ISO_BINARY, 0, 16, "Message authentication code"}
 };
 #endif /*ISO8583STANDARDS_H_*/
