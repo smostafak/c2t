@@ -65,29 +65,29 @@ typedef struct {
 	/*! \brief The flag to identify whether the bitmap is in binary or hexa format */
 	int bmp_flag;
 	/*! \brief The iso definition that the fields of this iso message conform to */
-	isodef* iso_def;
+	isodef* iso_def;	
 	/*! \brief The 129 field pointer array, each memeber cotains a byte array and its length */
 	bytes fld[129];
 } isomsg;
 
  /*! 		\brief	Initialize an ISO message struct - i.e. set all entries to NULL */
-void init_message(isomsg*, const int, const isodef* );
+void init_message(isomsg *m, const int bmp_flag, const isodef *def);
 
 /*!	\brief  pack the content of an ISO message  into a buffer. \n
  * 				 NOTE: the buffer must be large enough to contain the packed message.
  */
-int pack_message(const isomsg *, char*, int*);
+int pack_message(const isomsg *m, char *buf, int *buf_len);
 
  /*! 		\brief 		Using the definition d, unpack the content of buf into the ISO message struct m. */
-int unpack_message(isomsg *, const char *, int);
+int unpack_message(isomsg *m, const char *buf, int buf_len);
 
-void dump_message(FILE*, isomsg*, int );
+void dump_message(FILE *fp, isomsg *m, int fmt_flag);
 
 /*!  	\brief		Free memory used by the ISO message struct m. */
-void free_message(isomsg *);
+void free_message(isomsg *m);
 
 /*! 	\brief	assign an iso definition to m */
-void set_isodef(isomsg*, isodef*);
+void set_isodef(isomsg *m, isodef *def);
 
 /*!	\brief	convert an iso message to xml format		*/
 char* iso_to_xml(char* iso_msg, int iso_len, int bmp_flag);
@@ -96,11 +96,8 @@ char* iso_to_xml(char* iso_msg, int iso_len, int bmp_flag);
 char* xml_to_iso(char* xml_str, const isodef *def, int bmp_flag, int* iso_len);
 
 /*!	\func	set data to a field of iso msg	*/
-int set_field(isomsg* m, const isodef *def, int idx, const char* fld, int fld_len);
+int set_field(isomsg* m, int idx, const char *fld, int fld_len);
 /*!	\func	get data from a field of iso msg	*/
-int get_field(char* buf, const isodef *def, int idx, char* fld, int * fld_len, int bmp_flag);
-
-
-
+int get_field(char* buf, const isodef *def, int bmp_flag, int idx, char *fld, int *fld_len);
 
 #endif /* iso8583.h */
