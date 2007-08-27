@@ -9,6 +9,8 @@
 #define 	DATNULL	2		/* data is null */
 #define  EMTDATA 3		/*	both data and length empty */
 
+#define  SUCCEEDED 	0
+#define  FAILED			 	1
 /*!	\struct	bytearray
  * 		\brief	a structure that holds an array of bytes and its length.
  */
@@ -58,12 +60,12 @@ int bytes2hexachars(bytes*, bytes*);
 /*!		\fn 	set_data(bytes*, char*)
  * 			\brief	This function copy data to a bytes struct
  */
- void import_data(bytes*, const char*, int);
+ int import_data(bytes*, const char*, int);
 
 /*!		\fn 	export_data(bytes*, char*, int*)
  * 			\brief	This function copy data from a bytes struct to a buffer
  */
- void export_data(bytes*, char*, int*);
+ int export_data(bytes*, char*, int*);
 
  /*!		\fn 	set_length(bytes*, int)
  * 			\brief	This function sets length for a bytes struct

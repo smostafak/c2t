@@ -3,10 +3,11 @@
  */
 #include "utilities.h"
 #include <ctype.h>
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include "errors.h"
 /*!	\fn	int hexachar2int(char hexa_char)
  * 		\brief	This function convert a hexa character to its correspondent integer value
  * 		\param		hexa_char	the character to convert
@@ -15,6 +16,7 @@
  * 						or  -1 if having errors.
  */
 int	hexachar2int(char hexa_char){
+	setlocale(LC_CTYPE, "C");
 	if( isxdigit(hexa_char)){
 		if( isdigit(hexa_char))
 			return hexa_char - '0';
@@ -23,6 +25,7 @@ int	hexachar2int(char hexa_char){
 	}else{
 		return -1;
 	}
+	setlocale(LC_CTYPE, "");
 
 }
 
@@ -157,12 +160,19 @@ int bytes2hexachars(bytes* binary_bytes, bytes* hexa_chars){
  * 			\param		ptrbytes a bytes struct pointer that will be set data
  * 			\param		the data buffer that will be copied to ptrbytes
  * 			\param		the length of ptrchar
+ * 			\return		SUCCEEDED (0) if successfully copied data
+ * 							error number in case having an error
  */
- void import_data(bytes* ptrbytes, const char* ptrchar, int len){
+ int import_data(bytes* ptrbytes, const char* ptrchar, int len){
  		ptrbytes->length = len;
  		ptrbytes->bytes = (char*)calloc(ptrbytes->length, sizeof(char));
- 		if(ptrbytes->bytes != NULL)
-		memcpy(ptrbytes->bytes, ptrchar, len);
+ 		if(ptrbytes->bytes != NULL){
+			memcpy(ptrbytes->bytes, ptrchar, len);
+			return SUCCEEDED;
+ 		}else{
+ 			ptrbytes->length = 0;
+ 			return ERR_OUTMEM;
+ 		}
  }
 
  /*!		\fn 	export_data(bytes*, char*, int*)
@@ -170,11 +180,17 @@ int bytes2hexachars(bytes* binary_bytes, bytes* hexa_chars){
  * 			\param		ptrbytes a bytes struct pointer whose data will be copied
  * 			\param		ptrchar the data buffer to which the data will be copied
  * 			\param		ptrlen 	the length of the copied data will be set to this integer pointer
+ * 			\return		SUCCEEDED (0) if successfully copied
+ * 							error number in case having an error
  */
- void export_data(bytes* ptrbytes, char* ptrchar, int* ptrlen){
+int export_data(bytes* ptrbytes, char* ptrchar, int* ptrlen){
  		*ptrlen = ptrbytes->length;
- 		if(ptrchar != NULL)
- 		memcpy(ptrchar, ptrbytes->bytes, *ptrlen);
+ 		if(ptrchar != NULL && ptrbytes->bytes != NULL){
+ 			memcpy(ptrchar, ptrbytes->bytes, *ptrlen);
+ 			return SUCCEEDED;
+ 		}else{
+ 			return ERR_CPYNUL;
+ 		}
  }
 
 
