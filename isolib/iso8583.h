@@ -13,12 +13,12 @@
 #define ISO_ALPHABETIC					2			/*!	\brief	A datatype */
 #define ISO_BINARY       					3			/*!	\brief 	B datatype */
 #define ISO_Z									4			/*!	\brief	Z datatype */
-#define ISO_ALPHANUMERIC 				4			/*!	\brief 	AN datatype	*/
-#define ISO_ALPHASPECIAL 		5			/*!	\brief	AS datatype */
-#define ISO_NUMERICSPECIAL			6			/*!	\brief	NS datatype */
-#define ISO_XNUMERIC  					7			/*!	\brief 	X+Numeric datatype of field, X is 'C' or 'D' */
-#define ISO_ALPHANUMERIC_PAD		8 			/*!	\brief	ANP datatype */
-#define ISO_ALPHANUMERIC_SPC		9			/*!	\brief	ANS datatype	*/
+#define ISO_ALPHANUMERIC 				5			/*!	\brief 	AN datatype	*/
+#define ISO_ALPHASPECIAL 				6			/*!	\brief	AS datatype */
+#define ISO_NUMERICSPECIAL			7			/*!	\brief	NS datatype */
+#define ISO_XNUMERIC  					8			/*!	\brief 	X+Numeric datatype of field, X is 'C' or 'D' */
+#define ISO_ALPHANUMERIC_PAD		9 			/*!	\brief	ANP datatype */
+#define ISO_ALPHANUMERIC_SPC		10		/*!	\brief	ANS datatype	*/
 
 
 
