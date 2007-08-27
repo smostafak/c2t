@@ -59,7 +59,7 @@ static const isodef iso93[] = {
     /*053*/ {ISO_BINARY, 2, 48, "Security related control information"},
     /*054*/ {ISO_ALPHANUMERIC_SPC, 3, 120, "Amounts, additional"},
     /*055*/ {ISO_BINARY, 3, 255, "IC card system related data"},
-    /*056*/ {ISO_BINARY, 3, 255, "Original data elements"},
+    /*056*/ {ISO_BINARY, 3, 255, "OrigPinal data elements"},
     /*057*/ {ISO_NUMERIC, 0, 3, "Authorization life cycle code"},
     /*058*/ {ISO_NUMERIC, 2, 11, "Authorizing agent institution Id Code"},
     /*059*/ {ISO_ALPHANUMERIC_SPC, 3, 999, "Transport data"},
