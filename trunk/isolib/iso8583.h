@@ -75,6 +75,10 @@ typedef struct {
 typedef struct {
 	/*! \brief The flag to identify whether the bitmap is in binary or hexa format */
 	int bmp_flag;
+	/*! \brief The padding character for alphanumeric fields */
+	char alphanumeric_pad;
+	/*! \brief The padding character for numeric fields */
+	char numeric_pad;
 	/*! \brief The iso definition that the fields of this iso message conform to */
 	isodef* iso_def;
 	/*! \brief The 129 field pointer array, each memeber cotains a byte array and its length */
@@ -82,7 +86,7 @@ typedef struct {
 } isomsg;
 
  /*! 		\brief	Initialize an ISO message struct - i.e. set all entries to NULL */
-void init_message(isomsg *m, const int bmp_flag, const isodef *def);
+void init_message(isomsg *m, const int bmp_flag, const isodef *def, const char alphanumeric_pad, const char numeric_pad);
 
 /*!	\brief  pack the content of an ISO message  into a buffer. \n
  * 				 NOTE: the buffer must be large enough to contain the packed message.
