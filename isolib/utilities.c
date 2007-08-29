@@ -146,6 +146,99 @@ int bytes2hexachars(bytes* binary_bytes, bytes* hexa_chars){
  	}
  }
 
+ /*!		\fn		int verify_datatype(bytes*, int)
+ * 			\brief	This function checks whether a bytes struct has its data conformed to a specified datatype
+ * 			\param	 ptrbytes a bytes struct pointer that will be verified
+ * 			\return   CONFORM(0) if the struct's data conform to the specified datatype
+ * 						 NOT_CONFORM if the struct's data doesn't conform to the specified datatype
+ */
+ int verify_datatype(bytes* ptrbytes, int datatype){
+ 	int i=0;
+
+ 	/* verify the data of the struct	*/
+	if(verify_bytes(ptrbytes) != HASDATA)
+		return NOT_CONFORM;
+	switch(datatype){
+		case ISO_BINARY:{
+			return CONFORM;
+		}
+		break;
+		case ISO_ALPHABETIC:{			// Alphabetic
+				while(i < ptrbytes->length){
+					if(is_in_range(letter_range, *(ptrbytes->bytes + i)) != IN_RANGE)
+						return NOT_CONFORM;
+					i++;
+				}
+				return CONFORM;
+		}
+		break;
+		case ISO_NUMERIC:{			// Numeric
+				while(i < ptrbytes->length){
+					if(is_in_range(numeric_range, *(ptrbytes->bytes + i)) != IN_RANGE)
+							return NOT_CONFORM;
+					i++;
+				}
+				return CONFORM;
+		}
+		break;
+		case ISO_Z:{			// Z
+			return CONFORM;
+		}
+		break;
+		case ISO_ALPHANUMERIC:{		// AN datatype
+			while(i < ptrbytes->length){
+				if(is_in_range(numeric_range, *(ptrbytes->bytes + i)) != IN_RANGE && is_in_range(letter_range, *(ptrbytes->bytes + i)) != IN_RANGE)
+						return NOT_CONFORM;
+				i++;
+			}
+			return CONFORM;
+		}
+		break;
+		case ISO_ALPHASPECIAL:{		//	AS datatype
+			while(i < ptrbytes->length){
+				if(is_in_range(letter_range, *(ptrbytes->bytes + i)) != IN_RANGE && is_in_range(special_range, *(ptrbytes->bytes + i)) != IN_RANGE)
+						return NOT_CONFORM;
+				i++;
+			}
+			return CONFORM;
+		}
+		break;
+		case ISO_NUMERICSPECIAL:{	//	NS datatype
+			while(i < ptrbytes->length){
+				if(is_in_range(numeric_range, *(ptrbytes->bytes + i)) != IN_RANGE && is_in_range(special_range, *(ptrbytes->bytes + i)) != IN_RANGE)
+						return NOT_CONFORM;
+				i++;
+			}
+			return CONFORM;
+		}
+		break;
+		case ISO_ALPHANUMERIC_PAD:{		// ANP datatype
+			while(i < ptrbytes->length){
+				if(is_in_range(numeric_range, *(ptrbytes->bytes + i)) != IN_RANGE && is_in_range(letter_range, *(ptrbytes->bytes + i)) != IN_RANGE \
+				&& is_in_range(pad_range, *(ptrbytes->bytes + i)) != IN_RANGE)
+						return NOT_CONFORM;
+				i++;
+			}
+			return CONFORM;
+		}
+		break;
+		case ISO_ALPHANUMERIC_SPC:{		// ANS datatype
+			while(i < ptrbytes->length){
+				if(is_in_range(numeric_range, *(ptrbytes->bytes + i)) != IN_RANGE && is_in_range(numeric_range, *(ptrbytes->bytes + i)) != IN_RANGE \
+				&& is_in_range(special_range, *(ptrbytes->bytes + i)) != IN_RANGE)
+						return NOT_CONFORM;
+				i++;
+			}
+			return CONFORM;
+		}
+		break;
+		default:
+		break;
+	}
+	return CONFORM;
+ }
+
+
  /*!		\fn		void empty_bytes(bytes*);
  * 			\brief	This function make a bytes struct empty that is its bytes = NULL and its length = 0
  * 			\param  ptrbytes a bytes struct pointer that will be made empty
@@ -268,3 +361,20 @@ char *rpad(char *s, int len, char ch)
     return s;
 }
 
+/*!	\fn		int is_in_range(int** , char);
+ * 		\brief 		check whether a char is in a character range
+ * 		\param		cr	a range to check
+ * 		\param		ch the character that will be checked
+ * 		\return		INRANGE(0) if the char is in the range	\n
+ * 						NOTINRANGE(1) if the char is not in the range
+ */
+int is_in_range(char_range* cr, char ch){
+	while(cr->max != -1){
+		if( ch >= cr->min && ch <= cr->max){
+			return IN_RANGE;
+		}else{
+			cr ++;
+		}
+	}
+	return NOT_IN_RANGE;
+}

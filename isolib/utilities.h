@@ -9,8 +9,37 @@
 #define 	DATNULL	2		/* data is null */
 #define  EMTDATA 3		/*	both data and length empty */
 
-#define  SUCCEEDED 	0
-#define  FAILED			 	1
+#define  SUCCEEDED 			0
+#define  FAILED			 			1
+#define  CONFORM				0
+#define	NOT_CONFORM 		1
+#define  IN_RANGE				0
+#define	NOT_IN_RANGE		1
+#define  SPACE						31
+
+
+/*!	\struct	range
+ * 		\brief	a structure that holds a minimum and a maximum value of a character range
+ */
+typedef struct{
+	int min;
+	int max;
+}char_range;
+
+/*!	\brief	the code ranges of special charaters */
+static char_range		special_range[]={{33,47}, {58,64}, {91,96}, {123,126}, {-1, -1}};
+
+/*!	\brief	the code ranges of letter charaters */
+static char_range		letter_range[]= {{65,90}, 	{97,122}, {-1, -1}};
+
+/*!	\brief	the code ranges of numeric charaters */
+static char_range		numeric_range[]={{48, 57}, {-1, -1}};
+
+/*!	\brief	the code ranges of pad charaters */
+static char_range		pad_range[]={{32, 32}, {-1, -1}};
+
+
+
 /*!	\struct	bytearray
  * 		\brief	a structure that holds an array of bytes and its length.
  */
@@ -51,6 +80,11 @@ int bytes2hexachars(bytes*, bytes*);
  * 			\brief	This function checks whether a bytes struct has data or not
  */
  int verify_bytes(bytes*);
+
+/*!		\fn		int verify_datatype(bytes*, int)
+ * 			\brief	This function checks whether a bytes struct has its data conformed to a specified datatype
+ */
+ int verify_datatype(bytes*, int);
 
  /*!		\fn		void free_bytes(bytes*);
  * 			\brief	This function frees a bytes struct then makes it empty that is its bytes = NULL and its length = 0
@@ -95,5 +129,10 @@ char *lpad(char *s, int len, char ch);
  * 		\param  ch is character fill
  */
 char *rpad(char *s, int len, char ch);
+
+/*!	\fn	int is_in_range(int** , char);
+ * 		\brief 	check whether a char is in a character range
+ */
+int is_in_range(char_range* , char);
 
 #endif /*UTILITIES_H_*/
