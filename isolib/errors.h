@@ -19,6 +19,7 @@
 #define  ERR_HEXBYT	2000
 #define	ERR_BYTHEX	2001
 #define	ERR_WROFMT	2002
+#define ERR_CPYNUL		2003
 
 #define	ERR_NODFMT	4000	// not support this dump format
 
@@ -71,7 +72,8 @@ static const errmsg errdef[] ={
 		{ERR_XMLPAS, "The XML document is not well-formed"},
 		{ERR_IVLIDX,"Invalid index value"},
 		{ERR_SHTBUF,"The buffer is too short"},
-		{ERR_XMLSYT,"Xml syntax error"}
+		{ERR_XMLSYT,"Xml syntax error"},
+		{ERR_CPYNUL,""}
 }; /*The format error*/
 
 /*!	\func	void iso_err(int *fldErr, FILE *fp)
@@ -87,15 +89,6 @@ void iso_err(int *fldErr, char *filename);
  * 		\Output: one message to description the error
  */
 char *scan_err(int err_code);
-
-/*!	\func	check_fld(char *value, int idx, cons isodef *def)
- * 		\brief	this procedure is call to check weather a field is correct or not (pack and unpack)
- * 		\param	value: the value of this field (is set or get from msg)
- * 		\param idx: the possition of this field in msg
- * 		\param def: the definition is used to parse msg
- * 		\output: the errors code if have or zero (not error)
-*/
-int check_fld(const char *value, int len, int idx, const isodef *def);
 
 /*!	\func	void *sys_err(int err_code, FILE *fp)
  * 		\brief	This function is used to process the system error (such as out of memory ...)
