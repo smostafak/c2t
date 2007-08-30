@@ -81,6 +81,10 @@ int bytes2hexachars(bytes*, bytes*);
  */
  int verify_bytes(bytes*);
 
+/*!		\fn		void dump_bytes(bytes*)
+ * 			\brief	This function display a byte array in a special format */
+ void dump_bytes(bytes*);
+
 /*!		\fn		int verify_datatype(bytes*, int)
  * 			\brief	This function checks whether a bytes struct has its data conformed to a specified datatype
  */
@@ -114,21 +118,25 @@ int bytes2hexachars(bytes*, bytes*);
 
 int	int2bin(unsigned int);
 
-/*!	\fn	char *lpad(char *s, int len, char ch);
- * 		\brief
- * 		\param	s is a pointer to a string
- * 		\param  len is number
- * 		\param  ch is character fill
+/*!	\fn		int left_pad(bytes*, char);
+ * 		\brief 	This function pads the left side of a byte array with a character
  */
-char *lpad(char *s, int len, char ch);
+int left_pad(bytes*, int, char);
 
-/*!	\fn	char *rpad(char *s, int len, char ch);
- * 		\brief
- * 		\param	s is a pointer to a string
- * 		\param  len is number
- * 		\param  ch is character fill
+/*!	\fn		int right_pad(bytes*, char);
+ * 		\brief 	This function pads the right side of a byte array with a character
  */
-char *rpad(char *s, int len, char ch);
+int right_pad(bytes*, int, char);
+
+/*!	\fn		int left_trim(bytes*, char);
+ * 		\brief 	This function trims the left side of a byte array
+ */
+int left_trim(bytes*, char);
+
+/*!	\fn		int right_trim(bytes*, char);
+ * 		\brief 	This function trims the right side of a byte array
+ */
+int right_trim(bytes*, char);
 
 /*!	\fn	int is_in_range(int** , char);
  * 		\brief 	check whether a char is in a character range
