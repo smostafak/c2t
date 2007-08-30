@@ -146,6 +146,33 @@ int bytes2hexachars(bytes* binary_bytes, bytes* hexa_chars){
  	}
  }
 
+/*!		\fn		void dump_bytes(bytes*)
+ * 			\brief	This function display a byte array in a special format */
+ void dump_bytes(bytes* ptrbytes){
+ 	int i =0;
+ 	if(verify_bytes(ptrbytes) != HASDATA){
+ 		printf("The bytes struct has not contained data \n");
+ 		return;
+ 	}
+ 	setlocale(LC_CTYPE, "C");
+ 	printf("Each char is seperated with a space.\n If a char is a space, it will be displayed as SP. \n \
+ 	If a chacter is not printable, it will be display in hexadecimal format. \n");
+ 	for(i =0 ; i < ptrbytes->length; i++){
+ 		char ch = *(ptrbytes->bytes +i);
+ 		/* Is this char printable? */
+ 		if( isprint(ch)){
+			if( isspace(ch))
+				/* Is this char is a space character */
+				printf(" SP");
+			else
+				printf(" %c", ch);
+ 		}else{
+ 		/* This char is not printable, it will be printed in hexadecimal format */
+ 			printf(" 0x%x", ch);
+ 		}
+ 	}
+ }
+
  /*!		\fn		int verify_datatype(bytes*, int)
  * 			\brief	This function checks whether a bytes struct has its data conformed to a specified datatype
  * 			\param	 ptrbytes a bytes struct pointer that will be verified
@@ -330,35 +357,148 @@ int	int2bin(unsigned int in){
 	return 0;
 }
 
-/*!	\fn	char *lpad(char *s, int len, char ch);
- * 		\brief
- * 		\param	s is a pointer to a string
- * 		\param  len is number
- * 		\param  ch is character fill
+/*!	\fn			int left_pad(bytes*, char);
+ * 		\brief 		This function pads the left side of a byte array with a character
+ * 		\param		ptrbytes	a pointer to a ::bytes struct to be padded
+ * 		\param		max_len	the maximum length after padding
+ * 		\param		ch	a charater that will be used to pad with
+ * 		\return		SUCCEEDED  if successfully padding \n
+ * 						error number if having an error
  */
-char *lpad(char *s, int len, char ch)
-{
-    int i = strlen(s);
+int left_pad(bytes* ptrbytes, int max_len, char ch){
+	int i = 0, err = 0 ;
+	char* tmp_bytes;
 
-    if (i >= len) return(s);
-    memmove(s+len-i,s,(size_t)(i+1));
-    memset(s,ch,(size_t)(len-i));
-    return s;
+	/* verify the bytes struct */
+	err = verify_bytes(ptrbytes) ;
+	if(err != HASDATA)
+		return err;
+
+	if( ptrbytes->length > max_len)
+		return ERR_OVRLEN;
+	tmp_bytes = (char*) calloc( max_len, sizeof(char));
+	if(tmp_bytes == NULL){
+		return ERR_OUTMEM;
+	}
+	memcpy(tmp_bytes + (max_len - ptrbytes->length), ptrbytes->bytes, ptrbytes->length);
+	for(i = 0; i < (max_len - ptrbytes->length); i ++){
+		*(tmp_bytes + i) = ch;
+	}
+	/* free the old bytes struct */
+	free_bytes(ptrbytes);
+
+	/* create a new bytes struct */
+	err = import_data(ptrbytes, tmp_bytes, max_len);
+	if(err != SUCCEEDED){
+		free(tmp_bytes);
+		return err;
+	}
+	return SUCCEEDED;
 }
 
-/*!	\fn	char *rpad(char *s, int len, char ch);
- * 		\brief
- * 		\param	s is a pointer to a string
- * 		\param  len is number
- * 		\param  ch is character fill
+/*!	\fn		int right_pad(bytes*, char);
+ * 		\brief 	This function pads the right side of a byte array with a character
+ * 		\param		ptrbytes	a pointer to a ::bytes struct to be padded
+ * 		\param		max_len	the maximum length after padding
+ * 		\param		ch	a charater that will be used to pad with
+ * 		\return		SUCCEEDED if successfully padding \n
+ * 						error number if having an error
  */
-char *rpad(char *s, int len, char ch)
-{
-    int i = strlen(s);
+int right_pad(bytes* ptrbytes, int max_len, char ch){
+	int i = 0, err = 0 ;
+	char* tmp_bytes;
 
-    if (i >= len) return(s);
-    memset(s+i, ch, (size_t)(len - i));
-    return s;
+	/* verify the bytes struct */
+	err = verify_bytes(ptrbytes) ;
+	if(err != HASDATA)
+		return err;
+
+	if( ptrbytes->length > max_len)
+		return ERR_OVRLEN;
+	tmp_bytes = (char*) calloc( max_len, sizeof(char));
+	if(tmp_bytes == NULL){
+		return ERR_OUTMEM;
+	}
+	memcpy(tmp_bytes, ptrbytes->bytes, ptrbytes->length);
+	for(i = ptrbytes->length; i < max_len; i ++){
+		*(tmp_bytes + i) = ch;
+	}
+	/* free the old bytes struct */
+	free_bytes(ptrbytes);
+
+	/* create a new bytes struct */
+	err = import_data(ptrbytes, tmp_bytes, max_len);
+	if(err != SUCCEEDED){
+		free(tmp_bytes);
+		return err;
+	}
+	return SUCCEEDED;
+}
+
+/*!	\fn			int left_trim(bytes*, char);
+ * 		\brief 		This function trims the left side of a byte array
+ * 		\param		ptrbytes	a pointer to a ::bytes struct to be trimmed
+ * 		\param		ch	a charater that will be trimmed out
+ * 		\return		SUCCEEDED if successfully trimming \n
+ * 						error number			 if having an error
+ */
+int left_trim(bytes* ptrbytes, char ch){
+	int i = 0, err = 0 ;
+	bytes tmp_bytes;
+	err = verify_bytes(ptrbytes) ;
+	if(err != HASDATA)
+		return err;
+	/* copy data to a temporary struct */
+	empty_bytes(&tmp_bytes);
+	err = import_data(&tmp_bytes, ptrbytes->bytes, ptrbytes->length);
+	if(err != SUCCEEDED)
+		return err;
+	free_bytes(ptrbytes);
+	/* process the temporary struct */
+	while(*(tmp_bytes.bytes + i) == ch && i < tmp_bytes.length){
+		i++;
+	}
+	if(i < tmp_bytes.length){
+		err = import_data(ptrbytes, tmp_bytes.bytes + i, tmp_bytes.length - i);
+		free_bytes(&tmp_bytes);
+		setlocale(LC_CTYPE, "");
+		return err;
+	}
+	setlocale(LC_CTYPE, "");
+	free_bytes(&tmp_bytes);
+	return SUCCEEDED;
+}
+
+/*!	\fn		int right_trim(bytes*, char);
+ * 		\brief 	This function trims the right side of a byte array
+ * 		\param		ptrbytes	a pointer to a ::bytes struct to be trimmed
+ * 		\param		ch	a charater that will be trimmed out
+ * 		\return		SUCCEEDED if successfully trimming \n
+ * 						error number			 if having an error
+ */
+int right_trim(bytes* ptrbytes, char ch){
+	int i = ptrbytes->length -1, err = 0 ;
+	bytes tmp_bytes;
+	err = verify_bytes(ptrbytes) ;
+	if(err != HASDATA)
+		return err;
+	/* copy data to a temporary struct */
+	empty_bytes(&tmp_bytes);
+	err = import_data(&tmp_bytes, ptrbytes->bytes, ptrbytes->length);
+	if(err != SUCCEEDED)
+		return err;
+	free_bytes(ptrbytes);
+	/* process the temporary struct */
+	while(*(tmp_bytes.bytes + i) == ch && i >=0 ){
+		i--;
+	}
+	if(i >= 0){
+		err = import_data(ptrbytes, tmp_bytes.bytes, i+1);
+		free_bytes(&tmp_bytes);
+		return err;
+	}
+	free_bytes(&tmp_bytes);
+	return SUCCEEDED;
 }
 
 /*!	\fn		int is_in_range(int** , char);
