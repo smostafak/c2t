@@ -92,41 +92,6 @@ char* scan_err(int err_code)
 	}
 }
 
-/*!	\func	check_fld(char *value, int idx, cons isodef *def)
- * 		\brief	this procedure is call to check weather a field is correct or not (pack and unpack)
- * 		\param	value: the value of this field (is set or get from msg)
- * 		\param idx: the possition of this field in msg
- * 		\param def: the definition is used to parse msg
- * 		\output: the errors code if have or zero (not error)
-*/
-int check_fld(const char *value, int len, int idx, const isodef *def)
-{
-	int i;	
-	int format = def[idx].format;
-	
-	switch (format) {
-		case ISO_BITMAP:
-			break; //no checking here
-		case ISO_NUMERIC:
-			for(i = 0; i < len; i++) {
-				if(!isdigit(value[i]))
-					/* not a digit */
-					return ERR_IVLVAL;
-			}
-			break;
-		case ISO_ALPHANUMERIC:
-			for(i = 0; i < len; i++) {
-				if(iscntrl(value[i]))
-					/* invalid char */
-					return ERR_IVLVAL;
-				}
-			break;
-		case ISO_BINARY:
-			break;
-	}
-	
-	return 0; //no error found
-}
 /*!	\func	void *sys_err(int err_code, FILE *fp)
  * 		\brief	This function is used to process the system error (such as out of memory ...)
  * 		\param	err_code is the code of this error
