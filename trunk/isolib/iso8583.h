@@ -69,24 +69,33 @@ typedef struct {
 	const char *dsc;
 } isodef;
 
-/*!	\struct		isomsg
- * 		\brief		The ISO message structure
+/*!	\struct		isodef
+ * 		\brief		The structure holds all data delement definitions of an iso8583 version.
  */
 typedef struct {
+	/*!  \brief  The message properties:
 	/*! \brief The flag to identify whether the bitmap is in binary or hexa format */
 	int bmp_flag;
 	/*! \brief The padding character for alphanumeric fields */
 	char alphanumeric_pad;
 	/*! \brief The padding character for numeric fields */
-	char numeric_pad;
+	char numeric_pad;	
+} msgprop;
+
+/*!	\struct		isomsg
+ * 		\brief		The ISO message structure
+ */
+typedef struct {	
+	/*! \brief Properties of this iso message */
+	msgprop prop;
 	/*! \brief The iso definition that the fields of this iso message conform to */
-	isodef* iso_def;
+	const isodef *def;
 	/*! \brief The 129 field pointer array, each memeber cotains a byte array and its length */
 	bytes fld[129];
 } isomsg;
 
  /*! 		\brief	Initialize an ISO message struct - i.e. set all entries to NULL */
-void init_message(isomsg *m, const int bmp_flag, const isodef *def, const char alphanumeric_pad, const char numeric_pad);
+void init_message(isomsg *m, const isodef *def, const msgprop *prop);
 
 /*!	\brief  pack the content of an ISO message  into a buffer. \n
  * 				 NOTE: the buffer must be large enough to contain the packed message.
@@ -102,10 +111,13 @@ void dump_message(FILE *fp, isomsg *m, int fmt_flag);
 void free_message(isomsg *m);
 
 /*! 	\brief	assign an iso definition to m */
-void set_isodef(isomsg *m, isodef *def);
+void set_isodef(isomsg *m, const isodef *def);
+
+/*! 	\brief	assign an msgprop to m */
+void set_prop(isomsg *m, const msgprop *prop);
 
 /*!	\brief	convert an iso message to xml format		*/
-char* iso_to_xml(char* iso_msg, int iso_len, int bmp_flag);
+char* iso_to_xml(char* iso_msg, int iso_len, const isodef* def, );
 
 /*!	\brief	convert an xml string to iso message		*/
 char* xml_to_iso(char* xml_str, const isodef *def, int bmp_flag, int* iso_len);
@@ -113,6 +125,6 @@ char* xml_to_iso(char* xml_str, const isodef *def, int bmp_flag, int* iso_len);
 /*!	\func	set data to a field of iso msg	*/
 int set_field(isomsg* m, int idx, const char *fld, int fld_len);
 /*!	\func	get data from a field of iso msg	*/
-int get_field(char* buf, const isodef *def, int bmp_flag, int idx, char *fld, int *fld_len);
+int get_field(char* buf, const isodef *def, const msgprop *prop, int idx, char *fld, int *fld_len);
 
 #endif /* iso8583.h */
