@@ -51,48 +51,32 @@ struct  bytearray{
 /*!	\brief	Bytes is the alias of "struct bytearray" */
 typedef struct  bytearray	bytes;
 
-/*		\fn 		int 	hexachar2int(char );
- * 		\brief	This function converts a hexa character to its correspondent integer value
+/*! 		\brief	This function converts a hexa character to its correspondent integer value
  */
 int 	hexachar2int(char );
 
-/*		\fn		char*	hexachars2bytes(char*);
- * 		\brief	This function converts a hexa character array to its correspondent byte array
- */
+/*!	\brief	This function converts a hexa character array to its correspondent byte array */
 int	hexachars2bytes(bytes* , bytes* );
 
-/*!	\fn	char int2hexachar(int num)
- * 		\brief	This function convert an integer number to its correspondent hexa character
- */
+/*!	\brief	This function convert an integer number to its correspondent hexa character */
 char	int2hexachar(int );
 
-/*!		\fn		char* bytes2hexachars(char*);
- * 		\brief	This function converts a bytes character array to its conrrespondent hexa character array
- */
+/*!	\brief	This function converts a bytes character array to its conrrespondent hexa character array */
 int bytes2hexachars(bytes*, bytes*);
 
-/*!		\fn		void empty_bytes(bytes*);
- * 			\brief	This function makes a bytes struct empty that is its bytes = NULL and its length = 0
- */
+/*!	\brief	This function makes a bytes struct empty that is its bytes = NULL and its length = 0 */
  void empty_bytes(bytes*);
 
-/*!		\fn		int verify_bytes(bytes*)
- * 			\brief	This function checks whether a bytes struct has data or not
- */
+/*!	\brief	This function checks whether a bytes struct has data or not */
  int verify_bytes(bytes*);
 
-/*!		\fn		void dump_bytes(bytes*)
- * 			\brief	This function display a byte array in a special format */
+/*!	\brief	This function display a byte array in a special format */
  void dump_bytes(bytes*);
 
-/*!		\fn		int verify_datatype(bytes*, int)
- * 			\brief	This function checks whether a bytes struct has its data conformed to a specified datatype
- */
+/*!	\brief	This function checks whether a bytes struct has its data conformed to a specified datatype */
  int verify_datatype(bytes*, int);
 
- /*!		\fn		void free_bytes(bytes*);
- * 			\brief	This function frees a bytes struct then makes it empty that is its bytes = NULL and its length = 0
- */
+ /*!	\brief	This function frees a bytes struct then makes it empty that is its bytes = NULL and its length = 0  */
  void free_bytes(bytes*);
 
 /*!		\fn 	set_data(bytes*, char*)

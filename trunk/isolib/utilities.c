@@ -124,7 +124,7 @@ int bytes2hexachars(bytes* binary_bytes, bytes* hexa_chars){
 		return 0;
 }
 
-/*!		\fn		int verify_data(bytes*)
+ /*!		\fn		int verify_data(bytes*)
  * 			\brief	This function check whether a bytes struct has data or not
  * 			\param	 ptrbytes a bytes struct pointer that will be verified
  * 			\return  HASDATA (0) if ptrbytes->bytes != NULL and ptrbytes->length > 0 \n
@@ -171,6 +171,7 @@ int bytes2hexachars(bytes* binary_bytes, bytes* hexa_chars){
  			printf(" 0x%x", ch);
  		}
  	}
+ 	setlocale(LC_CTYPE, "");
  }
 
  /*!		\fn		int verify_datatype(bytes*, int)
