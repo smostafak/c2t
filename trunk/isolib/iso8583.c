@@ -9,20 +9,26 @@
 #include "errors.h"
 #include "include/expat.h"
 
-/*!	\func	void init_message(isomsg*, const int bmp_flag, const isodef *def);
- * 		\brief	Initialize an ISO message struct - i.e. set all entries to NULL 
- * 		\param	m is an ::isomsg
- * 		\param  bmp_flag 
- * 		\param  def is an ::isodef
+/*!	\func	void init_message(isomsg *m, const isodef *def, const msgprop *prop);
+ * 		\brief	Initialize an ISO message struct - i.e. set all entries to NULL
+ * 		\param	m is an ::isomsg pointer that will be initialized
+ * 		\param def is an ::isodef pointer that will be set as the iso definition of m
+ * 		\param	prop is a ::msgprop pointer whose value will be set as the properties of m
  */
-void init_message(isomsg *m, const int bmp_flag, const isodef *def)
-{
-	int i;
-	m->bmp_flag = bmp_flag;	/*!	Default format is binary format */
-	m->iso_def = def;
-	for (i = 0; i <= 128; i++) {
-		empty_bytes(&m->fld[i]);
-	}
+void init_message(isomsg *m, const isodef *def, const msgprop *prop){
+	int i = 0;
+	/* set isodef */
+		m->def = def;		/* if def is NULL, ok it will be set later */
+	/* set properties */
+		m->prop->alphanumeric_pad = prop->alphanumeric_pad;
+		m->prop->numeric_pad = prop->numeric_pad;
+		if(prop->bmp_flag != BMP_BINARY && prop->bmp_flag != BMP_HEXA)
+			m->prop->bmp_flag = BMP_BINARY;
+		else
+			 m->prop->bmp_flag = prop->bmp_flag;
+	/* initialize fld */
+		for(; i < 129; i++)
+			empty_bytes(&fld[i]);
 }
 
 
@@ -31,7 +37,7 @@ void init_message(isomsg *m, const int bmp_flag, const isodef *def)
  * 				 NOTE: buf must be large enough to contain the packed message.
  *				   Returns the length of the data written to buf.
  *
- * 		\param		m is an ::isomsg structure pointer that contains all message elements to be packed 
+ * 		\param		m is an ::isomsg structure pointer that contains all message elements to be packed
  * 		\param		buf is the iso message buffer that contains the packed iso message.
  * 		\param		buf_len is the pointer that hold the buf's length
  * 		\return		zero if having no error.
@@ -202,7 +208,7 @@ int pack_message(const isomsg *m, char *buf, int *buf_len)
 
 /*!	\func	int unpack_message(isomsg *m, const char *buf, int buf_len);
  * 		\brief 	Unpack the content of buf into the ISO message struct m.
- * 		\param 	m is an ::isomsg structure pointer that contains all message elements which are unpacked 
+ * 		\param 	m is an ::isomsg structure pointer that contains all message elements which are unpacked
  * 		\param	buf is the iso message buffer that contains the iso message that needs unpacking.
  * 		\param	buf_len is the length of the iso message buffer
  * 		\returns	0 in case successful unpacking \n
@@ -503,7 +509,7 @@ void free_message(isomsg *m)
 	int i;
 
 	for (i = 0; i <= 128; i++) {
-		free_bytes(&m->fld[i]);		
+		free_bytes(&m->fld[i]);
 	}
 }
 /*!	\func	int set_field(isomsg* m, int idx, const char *fld, int fld_len);
@@ -525,10 +531,10 @@ int set_field(isomsg* m, int idx, const char *fld, int fld_len)
 		handle_err(ERR_IVLFLD, ISO, err_msg);
 		return ERR_IVLFLD; /*Invalid field*/
 	}
-	
-	isodef *def = m->iso_def;	
-	
-	if ((def[idx].format == ISO_BINARY && m->bmp_flag == BMP_HEXA && fld_len > 2*def[idx].flds) 
+
+	isodef *def = m->iso_def;
+
+	if ((def[idx].format == ISO_BINARY && m->bmp_flag == BMP_HEXA && fld_len > 2*def[idx].flds)
 		|| (def[idx].format != ISO_BINARY && fld_len > def[idx].flds)) {
 		/*
 		 * The length of this field is too long
@@ -537,7 +543,7 @@ int set_field(isomsg* m, int idx, const char *fld, int fld_len)
 		handle_err(ERR_OVRLEN, ISO, err_msg);
 		return ERR_OVRLEN;
 	}
-	
+
 	int err_code = check_fld(fld, fld_len, idx, def);
 	if (err_code) {
 		/*
@@ -554,7 +560,7 @@ int set_field(isomsg* m, int idx, const char *fld, int fld_len)
 		handle_err(ERR_OUTMEM, SYS, err_msg);
 		return ERR_OUTMEM;
 	}
-	
+
 	switch (def[idx].format) {
 		case ISO_BITMAP:
 			break;
@@ -575,11 +581,11 @@ int set_field(isomsg* m, int idx, const char *fld, int fld_len)
 			handle_err(ERR_IVLFMT, ISO, err_msg);
 			return ERR_IVLFMT; /*invalid format*/
 	}
-	
+
 	// set data to the idxth field
 	m->fld[idx].bytes = field;
 	m->fld[idx].length = fld_len;
-	
+
 	return 0;
 }
 
@@ -587,10 +593,10 @@ int set_field(isomsg* m, int idx, const char *fld, int fld_len)
  * 	\brief	get data of a field from the msg buff.
  * 	\param	buf is iso message byte string
  * 	\param	def is an ::isodef
- * 	\param  bmp_flag 
+ * 	\param  bmp_flag
  * 	\param	idx is index of the field to be retrieved
  * 	\param	fld	is char string
- * 	\param  fld_len is the length of fld 
+ * 	\param  fld_len is the length of fld
  */
 
 int get_field(char* buf, const isodef *def, int bmp_flag, int idx, char *fld, int *fld_len)
@@ -618,7 +624,7 @@ int get_field(char* buf, const isodef *def, int bmp_flag, int idx, char *fld, in
 
 	if (idx == 0) {
 		/* the field is mti */
-		memcpy(fld,pos,def[0].flds);		
+		memcpy(fld,pos,def[0].flds);
 		*fld_len =  def[0].flds;
 		return 0;
 	}
@@ -670,14 +676,14 @@ int get_field(char* buf, const isodef *def, int bmp_flag, int idx, char *fld, in
 		bmp_len = byte_tmp.length/8;
 		memcpy(bitmap, byte_tmp.bytes, bmp_len);
 		free(hexa_tmp.bytes);
-		free(byte_tmp.bytes);		
+		free(byte_tmp.bytes);
 		pos += flds/4;
 	}
 
 	if (idx == 1) {
 		/* the field is bitmap */
 		*fld_len = bmp_len;
-		memcpy(fld,bitmap,bmp_len);		
+		memcpy(fld,bitmap,bmp_len);
 		return 0;
 	}
 
@@ -720,7 +726,7 @@ int get_field(char* buf, const isodef *def, int bmp_flag, int idx, char *fld, in
 				}
 
 				if (i == idx) {
-					*fld_len = len; 
+					*fld_len = len;
 					memcpy(fld, pos, len);
 					fld[len] = '\0';
 				}
