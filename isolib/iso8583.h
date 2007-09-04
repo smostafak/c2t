@@ -103,16 +103,16 @@ void dump_message(FILE *fp, isomsg *m, int fmt_flag);
 void free_message(isomsg *m);
 
 /*! 	\brief	assign an iso definition to m */
-void set_isodef(isomsg *m, const isodef *def);
+void set_isodef(isomsg *m, isodef *def);
 
 /*! 	\brief	assign an msgprop to m */
-void set_prop(isomsg *m, const msgprop *prop);
+void set_prop(isomsg *m, msgprop *prop);
 
 /*!	\brief	convert an iso message to xml format		*/
-char* iso_to_xml(char* iso_msg, int iso_len, const isodef* def, );
+char* iso_to_xml(char* iso_msg, int iso_len, const isodef* def ,msgprop* prop);
 
 /*!	\brief	convert an xml string to iso message		*/
-char* xml_to_iso(char* xml_str, const isodef *def, int bmp_flag, int* iso_len);
+char* xml_to_iso(char* xml_str, const isodef *def, msgprop* prop, int* iso_len);
 
 /*!	\func	set data to a field of iso msg	*/
 int set_field(isomsg* m, int idx, const char *fld, int fld_len);

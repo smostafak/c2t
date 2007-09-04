@@ -14,7 +14,7 @@ RANLIB = ranlib
 AR = ar rv
 
 # Our library that almost every program needs.
-LIB_OBJS = iso8583.o utilities.o errors.o convert.o
+LIB_OBJS = iso8583.o utilities.o errors.o # convert.o
 
 # Common temp files to delete from each directory.
 CLEANFILES = core core.* *.core *.o temp.* *.out typescript*
