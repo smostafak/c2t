@@ -21,9 +21,6 @@
 #define ISO_ALPHANUMERIC_SPC		10		/*!	\brief	ANS datatype	*/
 
 
-
-
-
 #define ISO_MAX_LENGTH		8192
 #define XML_MAX_LENGTH	8192
 #define PLAIN_MAX_LENGTH	8912
@@ -51,12 +48,7 @@
  * 		\brief		The structure holds all data delement definitions of an iso8583 version.
  */
 typedef struct {
-	/*!  \brief  The data element format:
-	 * 			- 0 for BITMAP
-	 * 			- 1 for Numeric
-	 * 			- 2 for alphanumeric
-	 * 			- 3 for binary
-	 */
+	/*!  \brief  The data element format */
 	int format;
 
 	/*! \brief  This var represents the length of the len portion of this data element (LL or LLL) */
@@ -79,13 +71,13 @@ typedef struct {
 	/*! \brief The padding character for alphanumeric fields */
 	char alphanumeric_pad;
 	/*! \brief The padding character for numeric fields */
-	char numeric_pad;	
+	char numeric_pad;
 } msgprop;
 
 /*!	\struct		isomsg
  * 		\brief		The ISO message structure
  */
-typedef struct {	
+typedef struct {
 	/*! \brief Properties of this iso message */
 	msgprop prop;
 	/*! \brief The iso definition that the fields of this iso message conform to */
@@ -100,7 +92,7 @@ void init_message(isomsg *m, const isodef *def, const msgprop *prop);
 /*!	\brief  pack the content of an ISO message  into a buffer. \n
  * 				 NOTE: the buffer must be large enough to contain the packed message.
  */
-int pack_message(const isomsg *m, char *buf, int *buf_len);
+int pack_message(isomsg *m, char *buf, int *buf_len);
 
  /*! 		\brief 		Using the definition d, unpack the content of buf into the ISO message struct m. */
 int unpack_message(isomsg *m, const char *buf, int buf_len);
