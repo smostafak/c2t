@@ -131,6 +131,8 @@ char* iso_to_xml(char* iso_msg, int iso_len, const isodef* def, int bmp_flag){
 		free_message(&iso_msg);
 		/* reset the erro_no before return */
 		err_no = 0;
+		if(err) return NULL;
+		else
 		return iso_buf;
 	}
  }

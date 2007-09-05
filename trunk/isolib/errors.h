@@ -5,21 +5,24 @@
 #define	WARN				0
 #define	ERR_OVRLEN	100
 #define	ERR_OUTMEM	101
-#define  ERR_OVIDX	102 //The index is out of range
-#define  ERR_IVLLEN 103
-#define  ERR_IVLFMT 104  //invalid format(format is not defined)
-#define  ERR_IVLVAL 105 //The value is not compatible with the format of this field
-#define  ERR_IVLFLD	106 // Invalid field
-#define 	ERR_IVLVER	107	// Invalid version
-#define	ERR_OUTRAG 108 //Out of range
-
+#define  ERR_OVIDX		102 		//The index is out of range
+#define  ERR_IVLLEN 	103
+#define  ERR_IVLFMT 	104  	//invalid format(format is not defined)
+#define  ERR_IVLVAL 	105 		//The value is not compatible with the format of this field
+#define  ERR_IVLFLD		106 		// Invalid field
+#define 	ERR_IVLVER		107		// Invalid version
+#define	ERR_OUTRAG 	108 		//Out of range
+#define 	ERR_IVLFLG		109		// Invalid flag
+#define	ERR_CPYNUL	110		//Copy NULL memory
+#define	ERR_APDNUL	111		//Use an empty memory to append
+#define	ERR_INSNUL		112		//Use an empty memory to insert
+#define	ERR_IVLPOS		113		// Invalid position
 
 
 /*! \brief	errors for utility functions from 2000 to 3000 */
 #define  ERR_HEXBYT	2000
 #define	ERR_BYTHEX	2001
 #define	ERR_WROFMT	2002
-#define ERR_CPYNUL		2003
 
 #define	ERR_NODFMT	4000	// not support this dump format
 
@@ -66,6 +69,7 @@ static const errmsg errdef[] ={
 		{ERR_BYTHEX, "Failed to convert a byte array to hexa characters"},
 		{ERR_NODFMT, "Not support this dump format"},
 		{ERR_IVLVER, "Invalid version"},
+		{ERR_IVLFLG, "Invalid flag"},
 		{ERR_OUTRAG, "Out of range"},
 		{ERR_WROFMT, "Wrong format"},
 		{ERR_PASMEM, "Couldn't allocate memory for parser"},
@@ -73,7 +77,10 @@ static const errmsg errdef[] ={
 		{ERR_IVLIDX,"Invalid index value"},
 		{ERR_SHTBUF,"The buffer is too short"},
 		{ERR_XMLSYT,"Xml syntax error"},
-		{ERR_CPYNUL,""}
+		{ERR_CPYNUL,"Copy NULL memory"},
+		{ERR_APDNUL,"Use an empty memory to append"},
+		{ERR_INSNUL, "Use an empty memory to insert"},
+		{ERR_IVLPOS, "Invalid position"}
 }; /*The format error*/
 
 /*!	\func	void iso_err(int *fldErr, FILE *fp)

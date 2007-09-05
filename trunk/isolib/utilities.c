@@ -11,41 +11,44 @@
 /*!	\fn	int hexachar2int(char hexa_char)
  * 		\brief	This function convert a hexa character to its correspondent integer value
  * 		\param		hexa_char	the character to convert
- *
- * 		\return		the correspondent integer value of this hexa_char
- * 						or  -1 if having errors.
+ *		\param		ptrint	the pointer that contains the address of  the output int.
+ * 		\return		SUCCEEDED if having no error \n
+ * 						error number if having an error
  */
-int	hexachar2int(char hexa_char){
+int	hexachar2int(char hexa_char, int* ptrint){
 	setlocale(LC_CTYPE, "C");
 	if( isxdigit(hexa_char)){
 		if( isdigit(hexa_char)){
-				setlocale(LC_CTYPE, "");
-			return hexa_char - '0';
+			setlocale(LC_CTYPE, "");
+			*ptrint  =  hexa_char - '0';
+			return SUCCEEDED;
 		}else{
 			setlocale(LC_CTYPE, "");
-			return tolower(hexa_char) - 'a' + 10 ;
+			*ptrint = tolower(hexa_char) - 'a' + 10 ;
+			return SUCCEEDED;
 		}
 	}else{
 		setlocale(LC_CTYPE, "");
-		return -1;
+		return ERR_OUTRAG;
 	}
 }
 
 /*!	\fn	char int2hexachar(int num)
  * 		\brief	This function convert an integer number to its correspondent hexa character
  * 		\param		num	the integer to convert
- *
- * 		\return		the correspondent hexa character of the integer number
- * 						or  -1 if having errors
+ *		\param		ptrch	the pointer that contains the address of the output char.
+ * 		\return		SUCCEEDED if having no error \n
+ * 						error number if having an error
  */
-char	int2hexachar(int num){
+int	int2hexachar(int num, char* ptrch){
 	if( num < 0 || num >15){
-		return -1;
+		return ERR_OUTRAG;
 	}else{
 		if(num <10)
-			return (char) ('0' + num);
+			*ptrch = (char) ('0' + num);
 		else
-			return (char) ('A' + num - 10);
+			*ptrch = (char) ('A' + num - 10);
+		return SUCCEEDED;
 	}
 }
 
@@ -55,30 +58,28 @@ char	int2hexachar(int num){
  * 													 Its length member contains the number of hexa character in the input array.
  * 		\param		binary_bytes	a ::Bytes struct that holds the result binary array. \n
  * 													 Its length member contains the number of bits in the result array.
- *
- *
- * 		\return		the number of bytes of the result array
- * 						-1 if having an error.
+ * 		\return		SUCCEEDED if having no error \n
+ * 						error number if having an error
  */
 int	hexachars2bytes(bytes* hexa_chars, bytes* binary_bytes){
-	int i, tmp, byte_len;
+	int i, tmp, byte_len, err =0;
 
 	byte_len = hexa_chars->length/2 +1;
 	binary_bytes->bytes = (char*) calloc(byte_len, sizeof(char));
 
 	if(!binary_bytes->bytes){
-		return -2;
+		return ERR_OUTMEM;
 	}
 
 	for(i=0; i< byte_len; i++){
 
-		tmp = hexachar2int(hexa_chars->bytes[2*i]);
-		if(tmp < 0) return -1;
+		err = hexachar2int(hexa_chars->bytes[2*i], &tmp);
+		if(err != SUCCEEDED) return err;
 
 		if( 2*i <= hexa_chars->length - 2){
 				binary_bytes->bytes[i] = tmp << 4;
-				tmp = hexachar2int(hexa_chars->bytes[2*i+1]);
-				if(tmp < 0) return -1;
+				err = hexachar2int(hexa_chars->bytes[2*i+1], &tmp);
+				if(err != SUCCEEDED) return err;
 				binary_bytes->bytes[i] |= tmp;
 				if( 2*i == hexa_chars->length-2){
 					binary_bytes->length = 8*(i+1);
@@ -90,7 +91,7 @@ int	hexachars2bytes(bytes* hexa_chars, bytes* binary_bytes){
 			break;
 		}
 	}
-	return i+1;
+	return SUCCEEDED;
 
 }
 
@@ -101,29 +102,29 @@ int	hexachars2bytes(bytes* hexa_chars, bytes* binary_bytes){
  * 		\param hexa_chars:  a ::Bytes struct that holds the output hexadecimal array. \n
  * 											 Its length member contains the number of characters in the result array.
  *
- * 		\return	the pointer of the correspondent hexa character array of this hexa byte array
- * 					NULL if having error
+ * 		\return	SUCCEEDED(0) if successfully converted \n
+ * 					error number if having an error
  */
 int bytes2hexachars(bytes* binary_bytes, bytes* hexa_chars){
-		int i, tmp;
+		int i, tmp, err = 0 ;
 		hexa_chars->length = binary_bytes->length / 4;
 		hexa_chars->bytes = (char*) calloc(hexa_chars->length, sizeof(char));
 		if( !hexa_chars->bytes)
-			return -1;
+			return ERR_OUTMEM;
 
 		for( i = 0; i < hexa_chars->length; i+=2){
 			if(i+1 < hexa_chars->length ){
 				tmp = (binary_bytes->bytes[i/2] & 0xF0) >> 4;
-				if( (hexa_chars->bytes[i] = int2hexachar(tmp)) < 0) return -1;
+				if( ( err = int2hexachar(tmp, &hexa_chars->bytes[i])) != SUCCEEDED) return err;
 				tmp = binary_bytes->bytes[i/2] & 0x0F;
-			 	if( (hexa_chars->bytes[i+1] = int2hexachar(tmp)) < 0) return -1;
+			 	if( (err = int2hexachar(tmp, &hexa_chars->bytes[i+1])) != SUCCEEDED) return err;
 			}else{
 				tmp = (binary_bytes->bytes[i/2+1] & 0xF0) >> 4;
-				if( (hexa_chars->bytes[i] = int2hexachar(tmp)) < 0) return -1;
+				if( (err = int2hexachar(tmp, &hexa_chars->bytes[i])) != SUCCEEDED) return err;
 				break;
 			}
 		}
-		return 0;
+		return SUCCEEDED;
 }
 
  /*!		\fn		int verify_data(bytes*)
@@ -303,7 +304,7 @@ int bytes2hexachars(bytes* binary_bytes, bytes* hexa_chars){
  * 			\param		ptrbytes a bytes struct pointer whose data will be copied
  * 			\param		ptrchar the data buffer to which the data will be copied
  * 			\param		ptrlen 	the length of the copied data will be set to this integer pointer
- * 			\return		SUCCEEDED (0) if successfully copied
+ * 			\return		SUCCEEDED (0) if successfully copied \n
  * 							error number in case having an error
  */
 int export_data(bytes* ptrbytes, char** ptrchar, int* ptrlen){
@@ -319,6 +320,65 @@ int export_data(bytes* ptrbytes, char** ptrchar, int* ptrlen){
  		}
  }
 
+/*!	\func		int append_bytes(bytes* ptrdes, bytes*ptrsrc)
+ * 		\brief		This function appends data of a bytes struct to another bytes struct.
+ * 		\param		ptrdes is a bytes struct pointer of the destination bytes
+ * 		\param		ptrsrc is a bytes struct pointer of the source bytes
+ * 		\return		SUCCEEDED (0) if successfully copied \n
+ * 							error number in case having an error
+ */
+int append_bytes(bytes* ptrdes, bytes*ptrsrc){
+	char* tmp;
+	int err = 0;
+	int len = ptrdes->length + ptrsrc->length;
+	if( verify_bytes(ptrsrc) != HASDATA){
+		return ERR_APDNUL;
+	}
+	tmp = (char*) calloc( len , sizeof(char));
+	if(tmp == NULL)
+		return ERR_OUTMEM;
+	memcpy(tmp, ptrdes->bytes, ptrdes->length);
+	memcpy(tmp + ptrdes->length, ptrsrc->bytes, ptrsrc->length);
+	free_bytes(ptrdes);
+	err = import_data(ptrdes, tmp, len);
+	free(tmp);
+	return err;
+}
+
+/*!	\func
+ * 		\brief	This function insert data of a bytes struct to a specified position of data of another bytes struct
+ * 		\param		ptrdes is a bytes struct pointer of the destination bytes
+ * 		\param		ptrsrc is a bytes struct pointer of the source bytes
+ * 		\param		pos is the position in the data of ptrdes at which data of ptrsrc will be inserted
+ * 		\return		SUCCEEDED (0) if successfully copied \n
+ * 							error number in case having an error
+ */
+int insert_bytes(bytes* ptrdes, bytes* ptrsrc, int pos){
+	char* tmp;
+	int err=0, len;
+	/* verify ptrsrc data */
+	if( verify_bytes(ptrsrc) != HASDATA)
+		return ERR_INSNUL;
+	if( pos < 0 || pos > ptrdes->length+1)
+		return ERR_IVLPOS;
+
+	len = ptrdes->length + ptrsrc->length;
+	tmp = (char*) calloc(len, sizeof(char));
+	if(tmp == NULL)
+		return ERR_OUTMEM;
+	if( pos == 0){
+		memcpy(tmp, ptrsrc->bytes, ptrsrc->length);
+		memcpy(tmp + ptrsrc->length, ptrdes->bytes, ptrdes->length);
+	}else{
+		memcpy(tmp, ptrdes->bytes, pos-1);
+		memcpy(tmp + pos-1, ptrsrc->bytes, ptrsrc->length);
+		memcpy(tmp + pos -1 + ptrsrc->length, ptrdes->bytes+ pos -1, len - pos - ptrsrc->length +1);
+	}
+	free_bytes(ptrdes);
+	err = import_data(ptrdes, tmp, len);
+	free(tmp);
+	return err;
+}
 
  /*!		\fn 	set_length(bytes*, int)
  * 			\brief	This function sets length for a bytes struct
