@@ -84,10 +84,9 @@ int bytes2hexachars(bytes*, bytes*);
  */
  int import_data(bytes*, const char*, int);
 
-/*!		\fn 	export_data(bytes*, char*, int*)
- * 			\brief	This function copy data from a bytes struct to a buffer
+/*! 			\brief	This function copy data from a bytes struct to a buffer
  */
- int export_data(bytes*, char*, int*);
+ int export_data(bytes*, char**, int*);
 
  /*!		\fn 	set_length(bytes*, int)
  * 			\brief	This function sets length for a bytes struct

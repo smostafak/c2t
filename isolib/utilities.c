@@ -18,15 +18,17 @@
 int	hexachar2int(char hexa_char){
 	setlocale(LC_CTYPE, "C");
 	if( isxdigit(hexa_char)){
-		if( isdigit(hexa_char))
+		if( isdigit(hexa_char)){
+				setlocale(LC_CTYPE, "");
 			return hexa_char - '0';
-		else
+		}else{
+			setlocale(LC_CTYPE, "");
 			return tolower(hexa_char) - 'a' + 10 ;
+		}
 	}else{
+		setlocale(LC_CTYPE, "");
 		return -1;
 	}
-	setlocale(LC_CTYPE, "");
-
 }
 
 /*!	\fn	char int2hexachar(int num)
@@ -304,10 +306,13 @@ int bytes2hexachars(bytes* binary_bytes, bytes* hexa_chars){
  * 			\return		SUCCEEDED (0) if successfully copied
  * 							error number in case having an error
  */
-int export_data(bytes* ptrbytes, char* ptrchar, int* ptrlen){
+int export_data(bytes* ptrbytes, char** ptrchar, int* ptrlen){
  		*ptrlen = ptrbytes->length;
  		if(ptrchar != NULL && ptrbytes->bytes != NULL){
- 			memcpy(ptrchar, ptrbytes->bytes, *ptrlen);
+ 			*ptrchar = (char*) calloc(*ptrlen + 1, sizeof(char));
+ 			if(*ptrchar == NULL)
+ 				return ERR_OUTMEM;
+ 			memcpy(*ptrchar, ptrbytes->bytes, *ptrlen);
  			return SUCCEEDED;
  		}else{
  			return ERR_CPYNUL;
