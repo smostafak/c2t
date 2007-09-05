@@ -53,13 +53,13 @@ typedef struct  bytearray	bytes;
 
 /*! 		\brief	This function converts a hexa character to its correspondent integer value
  */
-int 	hexachar2int(char );
+int 	hexachar2int(char, int* );
 
 /*!	\brief	This function converts a hexa character array to its correspondent byte array */
 int	hexachars2bytes(bytes* , bytes* );
 
 /*!	\brief	This function convert an integer number to its correspondent hexa character */
-char	int2hexachar(int );
+int	int2hexachar(int, char*);
 
 /*!	\brief	This function converts a bytes character array to its conrrespondent hexa character array */
 int bytes2hexachars(bytes*, bytes*);
@@ -84,9 +84,17 @@ int bytes2hexachars(bytes*, bytes*);
  */
  int import_data(bytes*, const char*, int);
 
-/*! 			\brief	This function copy data from a bytes struct to a buffer
+/*! 		\brief	This function copies data from a bytes struct to a buffer
  */
  int export_data(bytes*, char**, int*);
+
+/*!		\brief	This function appends data of a bytes struct to another bytes struct.
+ */
+int append_bytes(bytes*, bytes*);
+
+/*!		\brief	This function insert data of a bytes struct to a specified position of data of another bytes struct
+ */
+int insert_bytes(bytes*, bytes*, int);
 
  /*!		\fn 	set_length(bytes*, int)
  * 			\brief	This function sets length for a bytes struct

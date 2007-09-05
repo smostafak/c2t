@@ -62,9 +62,169 @@ void set_prop(isomsg *m, msgprop *prop){
  * 		\param		m is an ::isomsg structure pointer that contains all message elements to be packed
  * 		\param		buf is the iso message buffer that contains the packed iso message.
  * 		\param		buf_len is the pointer that hold the buf's length
- * 		\return		zero if having no error.
- * 					error number if having an error
+ * 		\return		SUCCEEDED(0) if having no error. \n
+ * 						error number if having an error
  */
+ int pack_message(isomsg* m, char** buf, int* buf_len){
+	bytes buf_bytes;
+	char bitmap[16];
+	int err=0, i = 0;
+	char errmsg[100];
+	bytes tmp_bytes, bin_bytes, hexa_bytes;
+	/* initilize buf_bytes, binary bitmap */
+	empty_bytes(&buf_bytes);
+	memset(bitmap, 16, '\0');
+
+	for( ; i <= 128 ; i++){
+		if ( i == 1) /* this field is the bitmap, it will be built from bitmap after this loop */
+			continue;
+		err = verify_bytes(&m->fld[i]);
+
+		/* this field does not contain data */
+		if(err != HASDATA){
+			if( i == 0 ){ /* this field is the MTI field, can't be empty, report error and return */
+				memset(errmsg, 100, '\0');
+				sprintf(errmsg, "%s:%d:The MTI field does not contain data", __FILE__, __LINE__);
+				handle_err(ERR_IVLFLD, ISO, errmsg);
+				free_bytes(&buf_bytes);
+				return ERR_IVLFLD;
+			}else{ /* this field is not the MTI field */
+				continue;
+			}
+		}
+
+		/* this field conatins data, verify its length */
+
+		/* verify format */
+		err = verify_datatype(&m->fld[i], m->def[i].format);
+		if(err != CONFORM ){
+				memset(errmsg, 100, '\0');
+				sprintf(errmsg, "%s:%d:The field #%d does not conform its definition format", __FILE__, __LINE__);
+				handle_err(ERR_IVLFMT, ISO, errmsg);
+				free_bytes(&buf_bytes);
+				return ERR_IVLFMT;
+		}
+
+		/* verify data length */
+		if(m->def[i].lenflds != 0){ /* fixed length */
+			if(m->fld[i].length > m->def[i].flds){		/* over its definition's length */
+				memset(errmsg, 100, '\0');
+				sprintf(errmsg, "%s:%d: The field #%d is over its defintion's length", __FILE__, __LINE__ - 3, i);
+				handle_err(ERR_IVLLEN, ISO, errmsg);
+				free_bytes(&buf_bytes);
+				return ERR_IVLLEN;
+			}
+			if(m->fld[i].length < m->def[i].flds){	/* this field's length is smaller than its definition's length */
+				/* pad this field */
+				if(m->def[i].format == ISO_NUMERIC){
+					err = left_pad(&m->fld[i], m->def[i].flds, m->prop.numeric_pad);
+					if(err != SUCCEEDED){
+						memset(errmsg, 100, '\0');
+						sprintf(errmsg, "%s:%d: Can't left pad the field #%d", __FILE__, __LINE__ - 3, i);
+						handle_err(err, SYS, errmsg);
+						free_bytes(&buf_bytes);
+						return err;
+					}
+				}else{
+					right_pad(&m->fld[i], m->def[i].flds, m->prop.alphanumeric_pad);
+					if(err != SUCCEEDED){
+						memset(errmsg, 100, '\0');
+						sprintf(errmsg, "%s:%d: Can't right pad the field #%d", __FILE__, __LINE__ - 3, i);
+						handle_err(err, SYS, errmsg);
+						free_bytes(&buf_bytes);
+						return err;
+					}
+				}
+			}
+			/* copy data to tmp_bytes */
+			empty_bytes(&tmp_bytes);
+			err = import_data(&tmp_bytes, m->fld[i].bytes, m->fld[i].length);
+			if(err != SUCCEEDED){
+				memset(errmsg, 100, '\0');
+				sprintf(errmsg, "%s:%d: Can not import data", __FILE__, __LINE__ - 3);
+				handle_err(err, SYS, errmsg);
+				free_bytes(&buf_bytes);
+				return err;
+			}
+		}else{	/* variable length */
+			char fmt[20], tmp[20];
+			if(m->fld[i].length != m->def[i].flds){ /* this field's length is different from its definition */
+				memset(errmsg, 100, '\0');
+				sprintf(errmsg, "%s:%d: The length of the field #%d  is different from its definition", __FILE__, __LINE__, i);
+				handle_err(ERR_IVLLEN, ISO, errmsg);
+				free_bytes(&buf_bytes);
+				return err;
+			}
+			/* this field has sufficient length, insert its length header, copy to tmp_bytes */
+			empty_bytes(&tmp_bytes);
+			sprintf(fmt, "%%0%dd", m->def[i].lenflds);
+			sscanf(tmp, fmt, m->fld[i].length);
+			err = import_data(&tmp_bytes, tmp, m->def[i].lenflds);
+			if(err != SUCCEEDED){
+				memset(errmsg, 100, '\0');
+				sprintf(errmsg, "%s:%d: Can not import data", __FILE__, __LINE__ - 3);
+				handle_err(err, SYS, errmsg);
+				free_bytes(&buf_bytes);
+				return err;
+			}
+			err = append_bytes(&tmp_bytes, &m->fld[i]);
+			if(err != SUCCEEDED){
+				memset(errmsg, 100, '\0');
+				sprintf(errmsg, "%s:%d: Can not append bytes", __FILE__, __LINE__);
+				handle_err(err, SYS, errmsg);
+				free_bytes(&buf_bytes);
+				return err;
+			}
+		}
+		/* copy data from tmp_bytes to buf_bytes */
+		err = append_bytes(&buf_bytes, &tmp_bytes);
+		if(err != SUCCEEDED){
+			memset(errmsg, 100, '\0');
+			sprintf(errmsg, "%s:%d: Can not append bytes", __FILE__, __LINE__ - 3);
+			handle_err(err, SYS, errmsg);
+			free_bytes(&tmp_bytes);
+			free_bytes(&buf_bytes);
+			return err;
+		}
+		/* update bitmap */
+		if( i > 64 ) bitmap[0] |= 0x80; /* there are more than 64 data element, set the first bit to 1 */
+		bitmap[(i-1)/8] |= 0x80 >> ((i-1)%8); /* set bit ith of bitmap to 0 */
+		/* free tmp_bytes */
+		free_bytes(&tmp_bytes);
+	}
+
+	/* convert bitmap to the specified format (BIN, HEX) */
+	empty_bytes(&bin_bytes);
+	empty_bytes(&hexa_bytes);
+	err= import_data(&bin_bytes, bitmap, ( i > 64 )?8:16);
+	if(err != SUCCEEDED){
+		memset(errmsg, 100, '\0');
+		sprintf(errmsg, "%s:%d: Can not import data", __FILE__, __LINE__ - 3);
+		handle_err(err, SYS, errmsg);
+		free_bytes(&buf_bytes);
+		return err;
+	}
+	err = bytes2hexachars(&bin_bytes, &hexa_bytes);
+	if(err != SUCCEEDED){
+		memset(errmsg, 100, '\0');
+		sprintf(errmsg, "%s:%d: Can not convert data from binary format to hexadecimal format", __FILE__, __LINE__ - 3);
+		handle_err(err, SYS, errmsg);
+		free_bytes(&buf_bytes);
+		return err;
+	}
+	err = insert_bytes(&buf_bytes, &hexa_bytes, 4);
+
+	if(err != SUCCEEDED){
+		memset(errmsg, 100, '\0');
+		sprintf(errmsg, "%s:%d: Can not insert bytes", __FILE__, __LINE__ - 3);
+		handle_err(err, SYS, errmsg);
+		free_bytes(&buf_bytes);
+		return err;
+	}
+
+	return 0;
+ }
+
 //int pack_message(const isomsg *m, char *buf, int *buf_len)
 //{
 //	char *start = buf;
@@ -226,7 +386,7 @@ void set_prop(isomsg *m, msgprop *prop){
 //	*buf_len = buf-start;
 //	return 0;
 //}
-//
+
 
 /*!	\func	int unpack_message(isomsg *m, const char *buf, int buf_len);
  * 		\brief 	Unpack the content of buf into the ISO message struct m.

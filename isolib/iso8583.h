@@ -92,7 +92,7 @@ void init_message(isomsg *m, const isodef *def, const msgprop *prop);
 /*!	\brief  pack the content of an ISO message  into a buffer. \n
  * 				 NOTE: the buffer must be large enough to contain the packed message.
  */
-int pack_message(isomsg *m, char *buf, int *buf_len);
+int pack_message(isomsg *m, char **buf, int *buf_len);
 
  /*! 		\brief 		Using the definition d, unpack the content of buf into the ISO message struct m. */
 int unpack_message(isomsg *m, const char *buf, int buf_len);
