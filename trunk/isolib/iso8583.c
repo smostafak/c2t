@@ -212,8 +212,8 @@ void set_prop(isomsg *m, msgprop *prop){
 		free_bytes(&buf_bytes);
 		return err;
 	}
+	/* Insert bitmap to buf_bytes */
 	err = insert_bytes(&buf_bytes, &hexa_bytes, 4);
-
 	if(err != SUCCEEDED){
 		memset(errmsg, 100, '\0');
 		sprintf(errmsg, "%s:%d: Can not insert bytes", __FILE__, __LINE__ - 3);
@@ -222,7 +222,17 @@ void set_prop(isomsg *m, msgprop *prop){
 		return err;
 	}
 
-	return 0;
+	/* copy the iso message to *buf, and its length to buf_len */
+	err = export_data(&buf_bytes, *buf, buf_len);
+	if(err != SUCCEEDED){
+		memset(errmsg, 100, '\0');
+		sprintf(errmsg, "%s:%d: Can not export bytes", __FILE__, __LINE__ - 3);
+		handle_err(err, SYS, errmsg);
+		free_bytes(&buf_bytes);
+		return err;
+	}
+
+	return SUCCEEDED;
  }
 
 //int pack_message(const isomsg *m, char *buf, int *buf_len)
