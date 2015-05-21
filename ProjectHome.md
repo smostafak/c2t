@@ -1,0 +1,1 @@
+The main goal of this project is to build a php module that can handle online financial transactions such as purchasing and transferring money.
